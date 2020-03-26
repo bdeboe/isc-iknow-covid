@@ -39,6 +39,19 @@ This class represents sets saved from the SetAnalysis demo application.</Descrip
 <ReadOnly>1</ReadOnly>
 </Property>
 
+<Property name="CreatedBy">
+<Type>%String</Type>
+<InitialExpression>$username</InitialExpression>
+<Required>1</Required>
+<Parameter name="MAXLEN" value="250"/>
+</Property>
+
+<Property name="CreatedAt">
+<Type>%TimeStamp</Type>
+<InitialExpression>$ZDATETIME($ZTIMESTAMP,3,1,3)</InitialExpression>
+<Required>1</Required>
+</Property>
+
 <Index name="NameIdx">
 <Properties>DomainId,Name</Properties>
 <Unique>1</Unique>
@@ -313,6 +326,12 @@ AddLeaf
 </Value>
 <Value name="6">
 <Value>CRCs</Value>
+</Value>
+<Value name="7">
+<Value>CreatedBy</Value>
+</Value>
+<Value name="8">
+<Value>CreatedAt</Value>
 </Value>
 </Data>
 </Storage>

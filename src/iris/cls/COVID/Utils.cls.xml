@@ -54,14 +54,13 @@
 		set tRS = ##class(%ResultSet).%New()
 		set tRS.ClassName = "%File"
 		set tRS.QueryName = "FileSet"
-		set tSC = tRS.%Execute(pDir, "*.json")
-		quit:$$$ISERR(tSC)
+		do tRS.%Execute(pDir, "*.json")
+		// ignore errors. they would simply mean the directory isn't there
 		
 		set tFile = ##class(%Stream.FileCharacter).%New()
 		
 		set (n,errors) = 0
 		while tRS.%Next() {
-			continue:tRS.Name["ffe663e4ef5018da41f057533520b9d85ec86e18.json"
 			set tRecord = ##class(Research.Document).%New()
 			do tFile.LinkToFile(tRS.Name)
 			set tSC = tRecord.%JSONImport(tFile)
@@ -105,10 +104,9 @@
 			}
 			
 			if $$$ISERR(tSC) {
-				write !,"Error writing paper ",$e($piece(tFile.Filename,tSep,*),1,*-5)," (",$system.Status.GetErrorText(tSC),"), skipping"
+				write !,"Error writing paper ",$e($piece(tFile.Filename,tSep,*),1,*-5), /*" (",$system.Status.GetErrorText(tSC),")",*/ ", skipping"
 				set errors = errors+1
 				quit:errors>=pMaxErrors
-				b
 			} else {
 				set n = n+1
 			}

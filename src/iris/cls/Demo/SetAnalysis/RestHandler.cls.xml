@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="IRIS" version="26">
 <Class name="Demo.SetAnalysis.RestHandler">
+<Description>
+See also https://github.com/bdeboe/isc-iknow-setanalysis</Description>
 <IncludeCode>%IKPublic</IncludeCode>
 <IncludeGenerator>%IKPublic</IncludeGenerator>
 <Super>%CSP.REST</Super>
@@ -609,7 +611,7 @@ Writes the following JSON output:
 		set:$data(%response) %response.ContentType="application/json"
 		set tJSON = ##class(%ZEN.proxyObject).%New()
 		
-		set tSQL = "SELECT ID FROM Demo_SetAnalysis.SetDefinition WHERE DomainId = "_pDomainId
+		set tSQL = "SELECT ID FROM Demo_SetAnalysis.SetDefinition WHERE DomainId = "_pDomainId_" AND CreatedBy = '"_$username_"'"
 		set tResult = ##class(%SQL.Statement).%ExecDirect(,tSQL)
 		set tJSON.Sets = ##class(%ListOfObjects).%New()
 		while tResult.%Next() {

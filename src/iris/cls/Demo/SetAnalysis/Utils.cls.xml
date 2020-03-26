@@ -1,197 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="IRIS" version="26">
 <Class name="Demo.SetAnalysis.Utils">
+<Description>
+Not relevant for COVID19 repo, so stripped-down and hidden
+See also https://github.com/bdeboe/isc-iknow-setanalysis</Description>
+<Hidden>1</Hidden>
 <IncludeCode>%IKPublic</IncludeCode>
 <TimeCreated>63655,65607.501668</TimeCreated>
-
-<Method name="Setup">
-<Description><![CDATA[
-<p>Sets up your SetAnalysis demo, based on the data in column <var>pDataColumn</var> in table
-<var>pTableName</var>, using columns <var>pMetadataColumns</var> as additional metadata fields to
-visualize on the main demo page.</p>
-<p>First, this method will try to setup the REST web application using <method>CreateRestWebApp</method>.
-Then, it will create a domain definition matching the table and column information you provided. 
-If needed, you can still modify that definition as you see fit, after which your domain will be built.</p>
-<p>Note that, if you already have a domain available, you'll only need to run the <method>CreateRestWebApp</method>
-method (once per namespace).</p>]]></Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec><![CDATA[pTableName:%String,pDataColumn:%String,pMetadataColumns:%List="",&pDomainName:%String=""]]></FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	set tSC = $$$OK
-	try {
-		do ..CreateRestWebApp(.tWebAppName)
-		
-		// some input cleansing
-		set:pDomainName="" pDomainName = $translate(pTableName,"_.","  ")
-		set pDomainName = $zstrip(pDomainName,"*W")
-		set:(pMetadataColumns'="")&&'$lv(pMetadataColumns) pMetadataColumns = $lfs(pMetadataColumns)
-		
-		// prepare metadata array tMetadata(FIELDNAME) = FIELDSPEC
-		for i = 1:1:$ll(pMetadataColumns) {
-			set tFieldSpec = $zstrip($lg(pMetadataColumns,i),"<>WP")
-			continue:tFieldSpec=""
-			set tAliased = $find($$$UPPER(tFieldSpec)," AS ")
-			set tFieldName = $s(tAliased:$e(tFieldSpec,tAliased,*), 1:tFieldSpec)
-			set tMetadata(tFieldName) = tFieldSpec
-		}
-		
-		// set up domain
-		set tSC = ..CreateDomainDefinition(pDomainName, pTableName, pDataColumn, .tMetadata, .tDomainDefClass)
-		quit:$$$ISERR(tSC)
-		
-	} catch (ex) {
-		set tSC = ex.AsStatus()
-	}
-	
-	if $$$ISOK(tSC) {
-		
-		write !,"Demo setup completed succesfully.",!!,"You can now make any final modifications to "_tDomainDefClass_" (refine metadata or configuration,...).",!,"Just hit enter when you're done",!
-		
-		read tDummy
-
-		set tSC = $classmethod(tDomainDefClass,"%Build")
-		
-		if $$$ISOK(tSC) {
-			set tDomainId = $classmethod(tDomainDefClass, "%GetDomainId")
-			do ##class(%Library.RoutineMgr).GetWebServerPort(.tPort,.tServer,.tURLPrefix,.tURL)		
-			write !,"You can now access your application at "_tURL_"csp/",$namespace,"/SetAnalysisDemo.csp?",tDomainId,!
-		}
-	} else {
-		write !!,"Something went wrong setting up your demo:",!
-		do $system.OBJ.DisplayError(tSC)
-	}
-	
-	quit tSC
-]]></Implementation>
-</Method>
-
-<Method name="CreateDomainDefinition">
-<Internal>1</Internal>
-<ClassMethod>1</ClassMethod>
-<FormalSpec><![CDATA[pDomainName:%String,pTableName:%String,pDataColumn:%String,&pMetadata,*pDomainDefClass:%String=""]]></FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	set tSC = $$$OK
-	try {
-		do $system.SQL.TableExists(pTableName,.tMetadata)
-		set tClassName = $lg(tMetadata,3)
-		set tPackageName = $piece(tClassName,".",1,*-1)
-		
-		set tDomainDef = ##class(%iKnow.Model.domain).%New()
-		set tDomainDef.name = pDomainName
-		//set tDomainDef.objectsPackage = tPackageName_".Tables"  // helpful addition in 2015.2
-		
-		// set sort field to spread, as that's the metric being visualized
-		set tParamDef = ##class(%iKnow.Model.parameter).%New()
-		set tParamDef.name = $$$IKPSORTFIELD
-		set tParamDef.value = $$$SORTBYSPREAD
-		set tParamDef.parent = tDomainDef
-		
-		// add data location
-		set tDomainDef.data = ##class(%iKnow.Model.data).%New()
-		set tListDef = ##class(%iKnow.Model.listTable).%New()
-		set tListDef.tableName = pTableName
-		set tListDef.idField = "ID"
-		set tListDef.groupField = "ID"
-		set tListDef.dataFields = pDataColumn
-		set tListDef.data = tDomainDef.data
-		
-		// add metadata
-		set tDomainDef.metadata = ##class(%iKnow.Model.metadata).%New()
-		set tFieldName = ""
-		for {
-			set tFieldName = $order(pMetadata(tFieldName), 1, tFieldSpec)
-			quit:tFieldName=""
-			set tListDef.metadataColumns = tListDef.metadataColumns _ $s(tListDef.metadataColumns="":"", 1:",") _ tFieldSpec
-			//set tListDef.metadataFields = tListDef.metadataFields _ $s(tListDef.metadataFields="":"", 1:",") _ tFieldName
-			set tFieldDef = ##class(%iKnow.Model.metadataField).%New()
-			set tFieldDef.name = tFieldName
-			set tFieldDef.metadata = tDomainDef.metadata
-		}
-		
-		// language
-rdlang	write !,"Which language are these texts in? [en] "
-		read tLanguage
-		if (tLanguage'="") && (tLanguage'="en") {
-			set tConfig = ##class(%iKnow.Model.configuration).%New()
-			set tConfig.name = pDomainName_".Config"
-			set tConfig.languages = tLanguage
-			set tSC = tConfig.%Validate()
-			if $$$ISERR(tSC) {
-				do $system.OBJ.DisplayError(tSC)
-				goto rdlang
-			}
-			do tDomainDef.configurations.Insert(tConfig)
-			set tParamDef = ##class(%iKnow.Model.parameter).%New()
-			set tParamDef.name = $$$IKPDEFAULTCONFIG
-			set tParamDef.value = tConfig.name
-			set tParamDef.parent = tDomainDef
-		}
-		write !
-		
-		set pDomainDefClass = tPackageName_".Domain"
-		
-		if (($system.Version.GetMajor()*10)+$system.Version.GetMinor())>=20152 {
-			// leverage utility methods in 2015.2+
-			set tSC = tDomainDef.%SaveToClass(pDomainDefClass, 1, 1, 1)
-			quit:$$$ISERR(tSC)
-		} else {
-			// otherwise do things manually
-			if $$$defClassDefined(pDomainDefClass) {
-				set tSC = $$Delete^%apiOBJ(pDomainDefClass)
-			}
-		    set tClass = ##class(%Dictionary.ClassDefinition).%New()
-		    set tClass.Name = pDomainDefClass
-		    set tClass.Super = "%iKnow.DomainDefinition"
-		    set tClass.ProcedureBlock = 1
-		    
-			// this is all taken care of inside %iKnow.Model.node after 2015.1!
-			set tSC = tDomainDef.XMLExportToString(.tString)
-			quit:$$$ISERR(tSC)
-			set tString = ##class(%DeepSee.PMML.Builder.AbstractBuilder).FormatXML(tString)  
-			// avoid minor inconvenience with predefined readonly attribute
-			set tString = $replace(tString, "listerClass=""%iKnow.Source.SQL.Lister""", "")
-			
-		    set tXData = ##class(%Dictionary.XDataDefinition).%New()
-		    set tXData.Name = "Domain"
-		    set tXData.XMLNamespace = "http://www.intersystems.com/iknow"
-		    do tClass.XDatas.Insert(tXData)
-			set tSC = tXData.Data.Write(tString)
-			quit:$$$ISERR(tSC)
-		    
-		    set tSC = tClass.%Save()
-		    quit:$$$ISERR(tSC)
-		    set tClass="", tXData=""
-		    
-		    set tSC = $system.OBJ.Compile(pDomainDefClass, "ckd /multicompile=0")
-			quit:$$$ISERR(tSC)
-		}
-		
-	} catch (ex) {
-		set tSC = ex.AsStatus()
-	}
-	quit tSC
-]]></Implementation>
-</Method>
 
 <Method name="CreateRestWebApp">
 <Description>
 Attempts to create a web application forwarding to Demo.SetAnalysis.RestHandler</Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec><![CDATA[&pWebAppName=""]]></FormalSpec>
+<CodeMode>objectgenerator</CodeMode>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	set tSC = $$$OK, tCreated=0, tCurrentNS = $$$LOWER($namespace)
 	try {
-		set:pWebAppName="" pWebAppName = "/csp/"_tCurrentNS_"/saREST/"
+		set:$g(pWebAppName)="" pWebAppName = "/csp/"_tCurrentNS_"/saREST/"
 		set tProperties("NameSpace") = tCurrentNS
 		set tProperties("DispatchClass") = "Demo.SetAnalysis.RestHandler"
-		set tProperties("AutheEnabled") = $$$AutheUnauthenticated
+		set tProperties("AutheEnabled") = $$$AutheUnauthenticated + $$$AutheCache
 		//set tProperties("iKnowEnabled") = 1
 		
 		zn "%SYS"
-		if '##class(Security.Applications).Exists(pWebAppName) {
+		if ##class(Security.Applications).Exists(pWebAppName) {
+			write !,"Web app ",pWebAppName," already exists",!
+		} else {
 			set tSC = ##class(Security.Applications).Create(pWebAppName, .tProperties)
 			quit:$$$ISERR(tSC)
 			set tCreated=1
@@ -209,7 +44,7 @@ Attempts to create a web application forwarding to Demo.SetAnalysis.RestHandler<
 	} elseif (tCreated) {
 		write !,"Web Application '"_pWebAppName_"' created successfully",!
 	}
-	
+	do %code.WriteLine("	quit $$$OK")
 	quit $$$OK
 ]]></Implementation>
 </Method>
