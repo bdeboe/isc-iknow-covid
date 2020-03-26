@@ -7,7 +7,7 @@ FROM intersystems/iris-community:2020.1.0.209.0
 
 ENV FILE_SERVER=ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com \
     FILE_UPDATE=2020-03-20 \
-    FILE_NAME=noncomm_use_subset
+    FILE_NAME=biorxiv_medrxiv
 
 USER root
 RUN mkdir /data && \

@@ -14,7 +14,9 @@ This repository contains everything you need to get started.
 
     This will set up and load the full demo environment. For container size convenience, the script only downloads the noncomm_use_subset archive from the [SemanticScholar portal](https://pages.semanticscholar.org/coronavirus-research). If you'd like to process other / additional archives, you can easily update or extend the `Dockerfile` (`iris.script` will transparently pick up any archive).
 
-    Note that processing all archives together will require a database beyond the maximum size allowed by the Community Edition license terms. You can update the `Dockerfile` to start from a full IRIS image and put your iris.key file in the repository root, where the build script will pick it up.
+    :warning: Note that the image produced by this script becomes quite large, depending on which archive you're processing. This is because the underlying NLP libraries generously generate indices to support a broad variety of queries. You may have to extend your Docker installation's max storage footprint under Settings > Resources > Advanced and/or the [maximum container size](https://docs.docker.com/engine/reference/commandline/dockerd/#options-per-storage-driver).
+
+    Processing all archives together will require a database beyond the maximum size allowed by the Community Edition license terms. You can update the `Dockerfile` to start from a full IRIS image and put your iris.key file in the repository root, where the build script will pick it up.
 
 2. Start your container:
 
