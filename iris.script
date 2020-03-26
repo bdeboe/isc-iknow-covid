@@ -1,0 +1,20 @@
+zn "%SYS"
+do ##class(Security.Users).PromptForNewPassword()
+SYS
+SYS
+w ##class(Security.Users).UnExpireUserPasswords("*")
+
+zn "USER"
+
+do $system.OBJ.LoadDir("/data/src/",,,1)
+
+do $system.OBJ.CompilePackage("Research")
+do $system.OBJ.CompilePackage("COVID")
+do $system.OBJ.CompilePackage("Demo")
+
+do ##class(COVID.Utils).LoadAll("/data/")
+
+do ##class(COVID.Domains.Abstracts).%Build()
+do ##class(COVID.Domains.BodyText).%Build()
+
+halt
