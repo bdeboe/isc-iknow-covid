@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="IRIS" version="26">
+<Class name="Research.FullDocument">
+<Language>objectscript</Language>
+<Super>%Persistent</Super>
+<TimeCreated>65458,47428.136309</TimeCreated>
+
+<Parameter name="USEEXTENTSET">
+<Default>1</Default>
+</Parameter>
+
+<Property name="Source">
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="200"/>
+</Property>
+
+<Property name="PaperID">
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="200"/>
+</Property>
+
+<Property name="Title">
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="1000"/>
+</Property>
+
+<Property name="Filename">
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="1000"/>
+</Property>
+
+<Property name="Abstract">
+<Type>%Stream.GblChrCompress</Type>
+</Property>
+
+<Property name="BodyText">
+<Type>%Stream.GblChrCompress</Type>
+</Property>
+
+<Index name="idxSource">
+<Type>bitmap</Type>
+<Properties>Source</Properties>
+</Index>
+
+<Index name="idxPaper">
+<Properties>PaperID</Properties>
+</Index>
+
+<Index name="idxAbstract">
+<Properties>Abstract</Properties>
+<TypeClass>%iFind.Index.Analytic</TypeClass>
+</Index>
+
+<Index name="idxBody">
+<Properties>BodyText</Properties>
+<TypeClass>%iFind.Index.Analytic</TypeClass>
+</Index>
+
+<Storage name="Default">
+<Type>%Storage.Persistent</Type>
+<DataLocation>^DCG2.YPjm.1</DataLocation>
+<DefaultData>FullDocumentDefaultData</DefaultData>
+<IdLocation>^DCG2.YPjm.1</IdLocation>
+<IndexLocation>^DCG2.YPjm.I</IndexLocation>
+<StreamLocation>^DCG2.YPjm.S</StreamLocation>
+<ExtentLocation>^DCG2.YPjm</ExtentLocation>
+<Data name="FullDocumentDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>Source</Value>
+</Value>
+<Value name="3">
+<Value>PaperID</Value>
+</Value>
+<Value name="4">
+<Value>Title</Value>
+</Value>
+<Value name="5">
+<Value>Filename</Value>
+</Value>
+<Value name="6">
+<Value>Abstract</Value>
+</Value>
+<Value name="7">
+<Value>BodyText</Value>
+</Value>
+</Data>
+<Index name="$FullDocument">
+<Location>^DCG2.YPjm.2</Location>
+</Index>
+<Index name="IDKEY">
+<Location>^DCG2.YPjm.1</Location>
+</Index>
+<Index name="idxAbstract">
+<Location>^DCG2.YPjm.3</Location>
+</Index>
+<Index name="idxBody">
+<Location>^DCG2.YPjm.4</Location>
+</Index>
+<Index name="idxPaper">
+<Location>^DCG2.YPjm.5</Location>
+</Index>
+<Index name="idxSource">
+<Location>^DCG2.YPjm.6</Location>
+</Index>
+</Storage>
+</Class>
+</Export>

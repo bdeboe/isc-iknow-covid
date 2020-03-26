@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="IRIS" version="26">
+<CSP name="SetAnalysisDemo.csp" application="/csp/covid/" default="1"><![CDATA[
+<!DOCTYPE html>
+<html ng-app="conceptsApp">
+  <head>
+    <title>iKnow Set Analysis demo</title>
+    <link rel="stylesheet" type="text/css" href="nglib/bootstrap/css/bootstrap.min.css" />
+    <style type="text/css">
+    .negation {
+	    text-decoration-color: red;
+	    -moz-text-decoration-color: red;
+    }
+    
+    .sent-pos {
+	    color: green;
+    }
+    .sent-neg {
+	    color: brown;
+    }
+    
+    .entity {
+	    font-weight: bold;
+	    color: Purple;
+    }
+    
+    .entityInSet1 {
+	    font-weight: bold;
+	    color: DarkGreen;
+    }
+    .entityInSet2 {
+	    font-weight: bold;
+	    color: Navy;
+    }
+    
+    .tab-pane {
+	    padding-top:10px;
+    }
+    .panel-body-table .tab-pane {
+	    padding-top: 0px;
+    }
+    .panel-body-table {
+	    padding: 0px;
+    }
+    .panel-body-table .table {
+	    margin-bottom: 0px;
+    }
+    
+    .glyphicon {
+	    cursor: pointer;
+    }
+    
+    
+	.panel.with-nav-tabs .panel-heading{
+	    padding: 5px 5px 0 5px;
+	}
+	.panel.with-nav-tabs .nav-tabs{
+		border-bottom: none;
+	}
+	.panel.with-nav-tabs .nav-justified{
+		margin-bottom: -1px;
+	}
+	
+	
+.with-nav-tabs.panel-primary .nav-tabs > li > a,
+.with-nav-tabs.panel-primary .nav-tabs > li > a:hover,
+.with-nav-tabs.panel-primary .nav-tabs > li > a:focus {
+    color: #fff;
+}
+.with-nav-tabs.panel-primary .nav-tabs > .open > a,
+.with-nav-tabs.panel-primary .nav-tabs > .open > a:hover,
+.with-nav-tabs.panel-primary .nav-tabs > .open > a:focus,
+.with-nav-tabs.panel-primary .nav-tabs > li > a:hover,
+.with-nav-tabs.panel-primary .nav-tabs > li > a:focus {
+	color: #fff;
+	background-color: #3071a9;
+	border-color: transparent;
+}
+.with-nav-tabs.panel-primary .nav-tabs > li.active > a,
+.with-nav-tabs.panel-primary .nav-tabs > li.active > a:hover,
+.with-nav-tabs.panel-primary .nav-tabs > li.active > a:focus {
+	color: #428bca;
+	background-color: #fff;
+	border-color: #428bca;
+	border-bottom-color: transparent;
+}
+.with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu {
+    background-color: #428bca;
+    border-color: #3071a9;
+}
+.with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > li > a {
+    color: #fff;   
+}
+.with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > li > a:hover,
+.with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > li > a:focus {
+    background-color: #3071a9;
+}
+.with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > .active > a,
+.with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > .active > a:hover,
+.with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > .active > a:focus {
+    background-color: #4a9fe9;
+}
+   </style>
+ </head>
+ <body style="padding: 15px">
+  <div class="container" ng-controller="DomainController as dc">
+     <ul class="nav nav-tabs" id="myTabs">
+       <li class=""><a href="SetAnalysisDemo.csp#table" data-toggle="tab" aria-expanded="false">Table</a></li>
+       <li class="active"><a href="SetAnalysisDemo.csp#concepts" data-toggle="tab" aria-expanded="true">Concepts</a></li>
+       <li class=""><a href="SetAnalysisDemo.csp#sets" data-toggle="tab" aria-expanded="false">Sets</a></li>
+       <li class="" ng-show="Features.HasSentiment"><a href="SetAnalysisDemo.csp#sentiment" data-toggle="tab" aria-expanded="false">Sentiment</a></li>
+     </ul>
+
+     <div id="myTabContent" class="tab-content" ng-controller="ConceptsController as cc">
+       
+	   <div class="tab-pane fade" id="table" ng-controller="SourceController as sc" style="padding-top:10px;">
+	    <div >
+	      <div class="well">
+
+	        <label>
+	          <input type="text" ng-model="criteria"></input>&nbsp;<span class="glyphicon glyphicon-search"></span>
+	        </label>
+	        <label class="pull-right">
+	         <div ng-click="sc.getSources()"><a class="icon-link"><span class="glyphicon glyphicon-refresh"></span> </a>
+	         </div>
+	        </label>
+	      </div>
+	      <table class="table table-hover">
+	        <thead>
+	          <th ng-repeat="md in mdData" ng-click="sc.sort(md);">{{md}}
+	            <span ng-class="{'glyphicon glyphicon-chevron-up': sc.isSortUp(md), 'glyphicon glyphicon-chevron-down': sc.isSortDown(md)}"></span>
+	          </th>
+	          <th>FullText</th>
+	          <th ng-click="sc.sort('Sets');">Sets <span ng-class="{'glyphicon glyphicon-chevron-up': sc.isSortUp('Sets'), 'glyphicon glyphicon-chevron-down': sc.isSortDown('Sets')}"></span></th>
+	        </thead>
+	        <tr ng-repeat="src in srcData | filter:criteria | orderBy:sc.sortField:sc.reverse | limitTo:100" ng-click="selectSource(src.SourceId)">  
+	          <td ng-repeat="md in mdData">{{src[md]}}</td>
+	          <td ng-bind-html="src.FullText"></td>
+	          <td><label ng-repeat="s in src.Sets" >{{s.Name}}</label></td>
+	        </tr>
+		   </table>
+		 </div>
+	   </div> <!--tabpane sources-->
+	   
+       <div class="tab-pane fade active in" id="concepts" style="padding-top:10px;">
+        <br>
+          <div class="row">
+		   <div class="col-md-4">
+		    <form class="form-inline">
+		     <select ng-model="filterSet" class="form-control input-sm" ng-change="refreshConcepts()">
+		      <option value="">show all</option>
+		      <option ng-repeat="set in sets" ng-value="set.Name">Filter by set '{{set.Name}}'</option>
+		     </select>
+		     <span class="dropdown">
+ 		      <button id="btnBlacklist" class="btn btn-sm" ng-class="{ 'btn-success': (!!filterBL), 'btn-default': (!filterBL) }" ng-show="Features.Blacklists.length > 0" data-toggle="dropdown" aria-haspopup="true" style="margin-left:10px;"><span class="glyphicon glyphicon-sunglasses"></span></button>
+		      <ul class="dropdown-menu" aria-labelledby="btnBlacklist">
+		       <li ng-repeat="bl in Features.Blacklists" style="padding: 0px 10px;"><input type="checkbox" ng-click="toggleBL(bl.ID)" style="margin-right: 10px;" />{{bl.Name}}</li>
+		      </ul>
+		     </span>
+		    </form>
+           </div>
+           <div class="col-md-4">
+             <div class="input-group">
+              <input type="text" class="form-control input-sm" placeholder="Concept fragment" ng-model="autocomplete" ng-keyup="exploreKey($event)">
+              <span class="input-group-btn">
+               <button class="btn btn-default btn-sm" ng-click="explore()">Go!</button>
+              </span>
+             </div>
+          </div> 
+           <div class="col-md-4">
+             <div class="input-group">
+              <input type="text" class="form-control input-sm" id="inputSet" placeholder="Set name" ng-model="SetName">
+              <span class="input-group-btn">
+               <button type="submit" ng-click="saveSet(SetName)" class="btn btn-default btn-sm">Save</button>
+              </span>
+             </div>
+           </div> 
+        </div>
+   
+        <div class="row">&nbsp;</div>
+        
+	   	 <div class="row">
+		   <div class="col-md-4">
+	         <div class="panel panel-primary">
+	           <div class="panel-heading">Concepts</div>
+	           <div class="panel-body panel-body-table" style="max-height: 600px;overflow-y: scroll;">
+                 <table class="table table-hover">
+                    <tr ng-repeat="concept in concepts">  
+	                  <td ng-click="selectConcept(concept)">{{concept.EntityValue}}</td>
+	                  <td>{{concept.Frequency}}</td>
+	                </tr>
+	             </table>
+ 		       </div>
+	 		 </div>
+           </div> 
+           <div class="col-md-4">
+		     <div class="row">
+		       <div class="col-md-12">
+	             <div class="panel with-nav-tabs panel-primary">
+	             
+	             
+	     	        <div class="panel-heading">
+	     	          <ul class="nav nav-tabs">
+	     	            <li class="active"><a href="#tabi1" data-toggle="tab">Similar Entities</a></li>
+	                    <li><a href="#tabi2" data-toggle="tab">CRCs</a></li>
+	     	          </ul>
+	    	        </div>
+	             
+	               <div class="panel-body panel-body-table" style="max-height: 600px;overflow-y: scroll;">
+	               
+	                 <div class="tab-content">
+	                 
+	                   <div class="tab-pane fade active in" id="tabi1">
+	                     <table class="table table-hover">
+	                       <tr ng-repeat="similarConcept in similar" ng-class="{'success': isSelected($index, 'entity')}">  
+		                     <td ng-click="selectSimilar(similarConcept, $index)">{{similarConcept.EntityValue}}</td>
+		                     <td>
+		                      <div ng-show="!similarConcept.canRemove">{{similarConcept.Frequency}}</div>
+		                      <div ng-show="similarConcept.canRemove">
+		                       <span class="glyphicon glyphicon-trash" 
+		                       		 title="Remove from set" ng-click="removeFromSet('entity', similarConcept);"></span>
+		                      </div>
+		                     </td>
+		                   </tr>
+		                 </table>
+		               </div>
+		               
+	                   <div class="tab-pane fade" id="tabi2">
+	                     <table class="table table-hover">
+	                       <tr ng-repeat="crc in crcs" ng-class="{'success': isSelected($index, 'crc')}">  
+		                     <td ng-click="selectCRC(crc, $index)">{{crc.Value}}</td>
+		                     <td>
+		                      <div ng-show="!crc.canRemove">{{crc.Frequency}}</div>
+		                      <div ng-show="crc.canRemove">
+		                       <span class="glyphicon glyphicon-trash" 
+		                       		 title="Remove from set" ng-click="removeFromSet('crc', crc);"></span>
+		                      </div>
+		                     </td>
+		                   </tr>
+		                 </table>
+		               </div>
+		               
+		             </div>
+ 		           </div>
+	 		     </div>
+               </div> 
+             </div> 
+          </div> 
+          <div class="col-md-4">
+	         <div class="panel panel-primary">
+	           <div class="panel-heading">Sentences</div>
+	           <div class="panel-body panel-body-table" style="max-height: 600px;overflow-y: scroll;">
+                 <table class="table table-hover">
+                    <tr ng-repeat="s in sentences" ng-click="selectSource(s.SourceId)">  
+	                  <td>
+	                    <div ng-bind-html="s.Text"></div>
+	                  </td>
+	                </tr>
+	             </table>
+ 		       </div>
+	 		 </div>
+           </div> 
+
+         </div>
+       </div>
+
+	   <div class="tab-pane fade" id="sets" style="padding-top:10px;">
+	   	   <div class="row">
+		     <div class="col-md-6">
+		     
+	             <div class="panel panel-primary">
+	               <div class="panel-heading">Sets 
+	                 <span class="pull-right">
+	                   <span class="glyphicon glyphicon-refresh" ng-click="getSets()" title="Refresh" ></span>
+	                   <span class="glyphicon glyphicon-plus-sign" style="margin-left:10px;" ng-click="newCompositeSet()" title="New composite set" ></span>
+	                 </span>
+	               </div>
+	               <div class="panel-body panel-body-table" style="max-height: 470px;overflow-y: scroll;">
+                     <table class="table table-hover">
+                       <tr ng-repeat="set in sets">  
+	                     <td width="20%" ng-click="selectSet(set)" >{{set.Name}}</td>
+	                     <td>
+			              <div class="progress" style="margin-bottom: 0px;">
+			               <div class="progress-bar progress-bar-info" role="progressbar"
+			               		ng-click="showSourcesBySet(set, set.OverlapSet)" 
+			               		ng-style="{ 'width': (100 * (set.Overlap) / totalSourcesDenominator).toFixed(2)+'%', 
+			               					'min-width': (set.Overlap>0) ? '20px' : '0px',
+			               					'cursor': 'pointer' }" 
+			               		title="{{set.Overlap}} records in common">
+			               	<div ng-show="set.Overlap > 0">{{set.Overlap}}</div>
+			               </div>
+			               <div class="progress-bar" role="progressbar" 
+			               		ng-class="{ 'progress-bar-success': isSelectedSet(set) }"
+			               		ng-click="selectSet(set, $index)" 
+			               		ng-style="{ 'width': (100 * (set.Sources-set.Overlap) / totalSourcesDenominator).toFixed(2)+'%', 
+			               					'min-width': (set.Overlap != set.Sources) ? '20px': '0px',
+			               					'cursor': 'pointer' }" 
+			               		title="{{(set.Overlap < set.Sources) ? ((set.Sources-set.Overlap)+' other') : set.Sources }} records in {{set.Name}}" >
+			               	<div ng-show="set.Overlap ? (set.Overlap < set.Sources) : true">{{set.Overlap ? (set.Sources-set.Overlap) : set.Sources}}</div>
+			               </div>
+			               <div ng-show="totalSourcesDenominator != totalSources" class="pull-right" style="margin-right: 5px;">...</div>
+			              </div>
+	                     </td>
+	                     <td width="15%">
+                           <span ng-click="editSet(set, $index)" class="glyphicon glyphicon-pencil" title="Edit this set" ></span>
+                           <span ng-click="deleteSet(set, $index)" class="glyphicon glyphicon-trash" title="Drop this set" style="margin-left: 10px;"></span>
+                         </td>
+	                   </tr>
+	                 </table>
+	               </div>
+	             </div>
+	             
+ 	             
+ 	             <div id="newSetModal" class="modal fade" role="dialog">
+				   <div class="modal-dialog">
+				    <div class="modal-content">
+				      <div class="modal-header">
+				        <button type="button" class="close" data-dismiss="modal">&times;</button>
+				        <h4 class="modal-title">New composite set</h4>
+				      </div>
+				      <div class="modal-body">
+				       <form>
+				        <div class="form-group">
+				         <label for="txtNewSetName">Set name</label>
+				         <input type="text" class="form-control" id="txtNewSetName" ng-model="SetName" placeholder="My set" />
+				        </div>
+				        <div class="form-group">
+				         <label for="txtNewSetLogic">Set logic</label>
+				         <input type="text" class="form-control" id="txtNewSetLogic" ng-model="SetLogic" placeholder="setA AND (setB OR setC)" />
+				        </div>
+				        <button type="button" class="btn btn-primary" ng-click="saveCompositeSet()">Save</button>
+				       </form>
+				      </div>
+				    </div>
+				  </div>
+				</div>
+	             
+		     </div>
+		     <div class="col-md-6">
+	             <div class="panel panel-primary">
+	               <div class="panel-heading">{{overlapSourcesRole}}</div>
+	               <div class="panel-body panel-body-table" style="max-height: 470px;overflow-y: scroll;">
+                     <table class="table table-hover">
+	                    <tr ng-repeat="source in overlapSources" ng-click="selectSource(source.SourceId)">  
+		                  <td>
+		                  {{source.SourceId}}: 
+		                    <div ng-bind-html="source.FullText"></div>
+		                  </td>
+		                </tr>
+	                 </table>
+	               </div> 
+	             </div> 
+		     </div>
+	       </div> 
+	   </div>
+
+
+
+	   <div class="tab-pane fade" id="sentiment" style="padding-top:10px;">
+	    <div class="col-md-5">
+	     <div class="row">
+	      <div class="well">
+	       <input type="text" ng-model="sentimentCriteria"></input>&nbsp;<span class="glyphicon glyphicon-search"></span>
+	      </div>
+	     </div>
+	     <div class="row" style="max-height: 450px; overflow-y: scroll;">
+	      <table class="table table-hover">
+	       <thead>
+	       	<th ng-click="cc.sort('EntityValue');" style="cursor: pointer;">Entity<i ng-class="{'glyphicon glyphicon-chevron-up': cc.isSortUp('EntityValue'), 'glyphicon glyphicon-chevron-down': cc.isSortDown('EntityValue')}"></i></th>
+	       	<th ng-click="cc.sort('TotalFrequency');" style="cursor: pointer;">Mentions<i ng-class="{'glyphicon glyphicon-chevron-up': cc.isSortUp('TotalFrequency'), 'glyphicon glyphicon-chevron-down': cc.isSortDown('TotalFrequency')}"></i></th>
+	       	<th>Sentiment
+	       	  <i ng-click="cc.sort('TotalPositive');" ng-class="{'glyphicon glyphicon-thumbs-up': true}" ></i>
+	       	  <i ng-click="cc.sort('TotalNegative');" ng-class="{'glyphicon glyphicon-thumbs-down': true}" ></i></th>
+	       </thead>
+	       <tbody>
+	        <tr ng-repeat="ent in sentimentData | filter:sentimentCriteria | orderBy:cc.sortField:cc.reverse | limitTo:100"
+	        	ng-click="selectConcept(ent);" style="cursor: pointer;" >
+	         <td ng-class="cc.sentimentClass(ent);">{{ent.EntityValue}}</td>
+	         <td>{{ent.TotalFrequency}}</td>
+	         <td>
+              <div class="progress" style="margin-bottom: 0px;">
+               <div class="progress-bar progress-bar-success" role="progressbar"
+               		ng-style="{ 'width': (100 * (ent.TotalPositive) / ent.TotalFrequency).toFixed(2)+'%', 
+               					'min-width': (ent.TotalPositive>0) ? '20px' : '0px',
+               					'cursor': 'pointer' }" 
+               		title="{{ent.TotalPositive}} positive mentions, {{ent.TotalFrequency}} in total">
+               	<div ng-show="ent.TotalPositive > 0">{{ent.TotalPositive}}</div>
+               </div>
+               <div class="progress-bar progress-bar-danger pull-right" role="progressbar" 
+               		ng-style="{ 'width': (100 * (ent.TotalNegative) / ent.TotalFrequency).toFixed(2)+'%', 
+               					'min-width': (ent.TotalNegative > 0) ? '20px': '0px',
+               					'cursor': 'pointer' }" 
+               		title="{{ent.TotalNegative}} negative mentions, {{ent.TotalFrequency}} in total" >
+               	<div ng-show="ent.TotalNegative > 0">{{ent.TotalNegative}}</div>
+               </div>
+               <div ng-show="(ent.TotalFrequency - ent.TotalPositive - ent.TotalNegative) > 0"
+               		style="text-align: center;">{{(ent.TotalFrequency - ent.TotalPositive - ent.TotalNegative)}}</div>
+              </div>
+	         </td>
+	        </tr>
+	       </tbody>
+	      </table>
+	     </div>
+	    </div>
+	   
+	    <div class="col-md-6 col-md-offset-1">
+	     <div class="row">
+	      <div class="well">
+	       <input type="text" ng-model="sentenceCriteriaStr"></input>&nbsp;<span class="glyphicon glyphicon-search"></span>
+	       <div class="pull-right">
+	        <a class="btn btn-default" ng-class="{ 'btn-primary': (sentFilterAtt=='')||(sentFilterAtt==undefined) }" ng-click="selectSentimentFilter('');" >all</a>
+	        <a class="btn btn-default text-success" ng-class="{ 'btn-success': sentFilterAtt=='pos' }" ng-click="selectSentimentFilter('pos');" >positive</a>
+	        <a class="btn btn-default text-danger" ng-class="{ 'btn-danger': sentFilterAtt=='neg' }" ng-click="selectSentimentFilter('neg');" >negative</a>
+	       </div>
+	      </div>
+	     </div>
+	         <div class="panel" ng-class="{ 'panel-default': (sentFilterAtt=='')||(sentFilterAtt==undefined), 'panel-success': (sentFilterAtt=='pos'), 'panel-danger': (sentFilterAtt=='neg') }">
+	           <div class="panel-heading">Sentences</div>
+	           <div class="panel-body panel-body-table" style="max-height: 450px; overflow-y: scroll;">
+                 <table class="table table-hover">
+                    <tr ng-repeat="s in sentences | filter:sentenceCriteriaStr | filter:sentenceCriteria" ng-click="selectSource(s.SourceId)">  
+	                  <td>
+	                    <div ng-bind-html="s.Text"></div>
+	                  </td>
+	                </tr>
+	             </table>
+ 		       </div>
+	 		 </div>
+	    </div>
+
+
+	   </div>
+	   
+	   
+	     <div id="fullSourceModal" class="modal fade" role="dialog">
+		   <div class="modal-dialog">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal">&times;</button>
+		        <h4 class="modal-title">Record #{{selectedSource.SourceId}}</h4>
+		      </div>
+		      <div class="modal-body">
+		        <div ng-bind-html="selectedSource.Text"></div>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+
+      </div> <!--myTabContent-->
+      
+      
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-danger">
+        <div class="modal-content">
+            <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="myModalLabel">(title)</h4>
+            </div>
+            <div class="modal-body">
+                <span class="modal-body-part1">(body)</span><br><br>
+                <span class="modal-body-part2">(body)</span><br><br>
+                <span class="modal-body-part3">(body)</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript" src="nglib/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="nglib/angular.min.js"></script>  <!--general angular framework-->
+    <script type="text/javascript" src="nglib/bootstrap/js/bootstrap.min.js"></script>  <!--twitter bootstrap framework -->
+    <script type="text/javascript" src="nglib/angular-sanitize.min.js"></script>  <!--angular tools for sanitize (html safe output like $sce -->
+    <script type="text/javascript" src="SetAnalysisDemo.js"></script>
+   </div> <!--container-->
+  </body>
+</html>
+]]></CSP>
+</Export>

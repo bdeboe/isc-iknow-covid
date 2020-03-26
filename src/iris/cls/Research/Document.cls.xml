@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="IRIS" version="26">
+<Class name="Research.Document">
+<ProcedureBlock>1</ProcedureBlock>
+<Super>%Persistent,%XML.Adaptor,%JSON.Adaptor</Super>
+<TimeCreated>65457,63825.511937</TimeCreated>
+<Inheritance>left</Inheritance>
+
+<Parameter name="%JSONIGNOREINVALIDFIELD">
+<Default>1</Default>
+</Parameter>
+
+<Parameter name="%JSONIGNORENULL">
+<Type>BOOLEAN</Type>
+<Default>1</Default>
+</Parameter>
+
+<Property name="Source">
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="200"/>
+</Property>
+
+<Property name="Filename">
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="1000"/>
+</Property>
+
+<Property name="abstract">
+<Type>Research.Document.abstract</Type>
+<Cardinality>children</Cardinality>
+<Inverse>Document</Inverse>
+<Relationship>1</Relationship>
+<Parameter name="%JSONFIELDNAME" value="abstract"/>
+</Property>
+
+<Property name="backmatter">
+<Type>Research.Document.backmatter</Type>
+<Cardinality>children</Cardinality>
+<Inverse>Document</Inverse>
+<Relationship>1</Relationship>
+<Parameter name="%JSONFIELDNAME" value="back_matter"/>
+</Property>
+
+<Property name="bibentries">
+<Type>Research.Document.bibentries</Type>
+<Parameter name="%JSONFIELDNAME" value="bib_entries"/>
+</Property>
+
+<Property name="bodytext">
+<Type>Research.Document.bodytext</Type>
+<Cardinality>children</Cardinality>
+<Inverse>Document</Inverse>
+<Relationship>1</Relationship>
+<Parameter name="%JSONFIELDNAME" value="body_text"/>
+</Property>
+
+<Property name="metadata">
+<Type>Research.Document.metadata</Type>
+<Parameter name="%JSONFIELDNAME" value="metadata"/>
+</Property>
+
+<Property name="paperid">
+<Type>%String</Type>
+<Parameter name="%JSONFIELDNAME" value="paper_id"/>
+<Parameter name="MAXLEN"/>
+</Property>
+
+<Property name="refentries">
+<Type>Research.Document.refentries</Type>
+<Parameter name="%JSONFIELDNAME" value="ref_entries"/>
+</Property>
+
+<Storage name="Default">
+<Type>%Storage.Persistent</Type>
+<DataLocation>^Research.DocumentD</DataLocation>
+<DefaultData>DocumentDefaultData</DefaultData>
+<IdLocation>^Research.DocumentD</IdLocation>
+<IndexLocation>^Research.DocumentI</IndexLocation>
+<StreamLocation>^Research.DocumentS</StreamLocation>
+<Data name="DocumentDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>bibentries</Value>
+</Value>
+<Value name="3">
+<Value>metadata</Value>
+</Value>
+<Value name="4">
+<Value>paperid</Value>
+</Value>
+<Value name="5">
+<Value>refentries</Value>
+</Value>
+<Value name="6">
+<Value>Source</Value>
+</Value>
+<Value name="7">
+<Value>Filename</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

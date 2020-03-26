@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="IRIS" version="26">
+<Class name="Research.Document.bibentries">
+<ProcedureBlock>1</ProcedureBlock>
+<Super>%Persistent,%XML.Adaptor,%JSON.Adaptor</Super>
+<TimeCreated>65457,63825.524463</TimeCreated>
+<Inheritance>left</Inheritance>
+
+<Parameter name="%JSONIGNOREINVALIDFIELD">
+<Description>
+The %JSONIGNOREINVALIDFIELD parameter allows the programmer to control handling of unexpected fields in the JSON input.
+The default (%JSONIGNOREINVALIDFIELD = 0) will treat an unexpected field as an error.
+If %JSONIGNOREINVALIDFIELD is set = 1, then unexpected fields will be ignored.</Description>
+<Type>BOOLEAN</Type>
+<Default>1</Default>
+</Parameter>
+
+<Storage name="Default">
+<Type>%Storage.Persistent</Type>
+<DataLocation>^Research.Document.bibentriesD</DataLocation>
+<DefaultData>bibentriesDefaultData</DefaultData>
+<IdLocation>^Research.Document.bibentriesD</IdLocation>
+<IndexLocation>^Research.Document.bibentriesI</IndexLocation>
+<StreamLocation>^Research.Document.bibentriesS</StreamLocation>
+<Data name="bibentriesDefaultData">
+<Structure>listnode</Structure>
+<Subscript/>
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

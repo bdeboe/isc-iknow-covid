@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="IRIS" version="26">
+<Class name="Research.Document.backmatter.citespans">
+<ProcedureBlock>1</ProcedureBlock>
+<Super>%Persistent,%XML.Adaptor,%JSON.Adaptor</Super>
+<TimeCreated>65457,64883.068172</TimeCreated>
+<Inheritance>left</Inheritance>
+
+<Parameter name="%JSONIGNOREINVALIDFIELD">
+<Default>1</Default>
+</Parameter>
+
+<Parameter name="%JSONIGNORENULL">
+<Type>BOOLEAN</Type>
+<Default>1</Default>
+</Parameter>
+
+<Property name="backmatter">
+<Type>Research.Document.backmatter</Type>
+<Cardinality>parent</Cardinality>
+<Inverse>citespans</Inverse>
+<Relationship>1</Relationship>
+</Property>
+
+<Property name="end">
+<Type>%Numeric</Type>
+<Parameter name="%JSONFIELDNAME" value="end"/>
+<Parameter name="SCALE" value="0"/>
+</Property>
+
+<Property name="refid">
+<Type>%String</Type>
+<Parameter name="%JSONFIELDNAME" value="ref_id"/>
+<Parameter name="MAXLEN"/>
+</Property>
+
+<Property name="start">
+<Type>%Numeric</Type>
+<Parameter name="%JSONFIELDNAME" value="start"/>
+<Parameter name="SCALE" value="0"/>
+</Property>
+
+<Property name="text">
+<Type>%String</Type>
+<Parameter name="%JSONFIELDNAME" value="text"/>
+<Parameter name="MAXLEN"/>
+</Property>
+
+<Storage name="Default">
+<Type>%Storage.Persistent</Type>
+<DataLocation>{%%PARENT}("citespans")</DataLocation>
+<DefaultData>citespansDefaultData</DefaultData>
+<IdLocation>^Research.Document.backmatterC("citespans")</IdLocation>
+<IndexLocation>^Research.Documen79C7.citespansI</IndexLocation>
+<StreamLocation>^Research.Documen79C7.citespansS</StreamLocation>
+<Data name="citespansDefaultData">
+<Structure>listnode</Structure>
+<Subscript/>
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>end</Value>
+</Value>
+<Value name="3">
+<Value>refid</Value>
+</Value>
+<Value name="4">
+<Value>start</Value>
+</Value>
+<Value name="5">
+<Value>text</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

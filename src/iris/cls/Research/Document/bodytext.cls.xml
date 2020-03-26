@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="IRIS" version="26">
+<Class name="Research.Document.bodytext">
+<ProcedureBlock>1</ProcedureBlock>
+<Super>%Persistent,%XML.Adaptor,%JSON.Adaptor</Super>
+<TimeCreated>65457,63825.522058</TimeCreated>
+<Inheritance>left</Inheritance>
+
+<Parameter name="%JSONIGNOREINVALIDFIELD">
+<Default>1</Default>
+</Parameter>
+
+<Parameter name="%JSONIGNORENULL">
+<Type>BOOLEAN</Type>
+<Default>1</Default>
+</Parameter>
+
+<Property name="Document">
+<Type>Research.Document</Type>
+<Cardinality>parent</Cardinality>
+<Inverse>bodytext</Inverse>
+<Relationship>1</Relationship>
+</Property>
+
+<Property name="citespans">
+<Type>Research.Document.bodytext.citespans</Type>
+<Cardinality>children</Cardinality>
+<Inverse>bodytext</Inverse>
+<Relationship>1</Relationship>
+<Parameter name="%JSONFIELDNAME" value="cite_spans"/>
+</Property>
+
+<Property name="refspans">
+<Type>Research.Document.bodytext.refspans</Type>
+<Cardinality>children</Cardinality>
+<Inverse>bodytext</Inverse>
+<Relationship>1</Relationship>
+<Parameter name="%JSONFIELDNAME" value="ref_spans"/>
+</Property>
+
+<Property name="section">
+<Type>%String</Type>
+<SqlFieldName>section_name</SqlFieldName>
+<Parameter name="%JSONFIELDNAME" value="section"/>
+<Parameter name="MAXLEN"/>
+</Property>
+
+<Property name="text">
+<Type>%String</Type>
+<Parameter name="%JSONFIELDNAME" value="text"/>
+<Parameter name="MAXLEN"/>
+</Property>
+
+<Storage name="Default">
+<Type>%Storage.Persistent</Type>
+<DataLocation>{%%PARENT}("bodytext")</DataLocation>
+<DefaultData>bodytextDefaultData</DefaultData>
+<IdLocation>^Research.DocumentC("bodytext")</IdLocation>
+<IndexLocation>^Research.Document.bodytextI</IndexLocation>
+<StreamLocation>^Research.Document.bodytextS</StreamLocation>
+<Data name="bodytextDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>refspans</Value>
+</Value>
+<Value name="3">
+<Value>section</Value>
+</Value>
+<Value name="4">
+<Value>text</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

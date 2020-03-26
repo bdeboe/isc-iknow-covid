@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="IRIS" version="26">
+<Class name="Research.Document.metadata.authors.affiliation">
+<ProcedureBlock>1</ProcedureBlock>
+<Super>%Persistent,%XML.Adaptor,%JSON.Adaptor</Super>
+<TimeCreated>65457,63825.514689</TimeCreated>
+<Inheritance>left</Inheritance>
+
+<Parameter name="%JSONIGNOREINVALIDFIELD">
+<Default>1</Default>
+</Parameter>
+
+<Property name="institution">
+<Type>%String</Type>
+<Parameter name="%JSONFIELDNAME" value="institution"/>
+<Parameter name="MAXLEN"/>
+</Property>
+
+<Property name="laboratory">
+<Type>%String</Type>
+<Parameter name="%JSONFIELDNAME" value="laboratory"/>
+<Parameter name="MAXLEN"/>
+</Property>
+
+<Property name="location">
+<Type>Research.Document.metadata.authors.affiliation.location</Type>
+<Parameter name="%JSONFIELDNAME" value="location"/>
+</Property>
+
+<Storage name="Default">
+<Type>%Storage.Persistent</Type>
+<DataLocation>^Research.DocumeFB8.affiliationD</DataLocation>
+<DefaultData>affiliationDefaultData</DefaultData>
+<IdLocation>^Research.DocumeFB8.affiliationD</IdLocation>
+<IndexLocation>^Research.DocumeFB8.affiliationI</IndexLocation>
+<StreamLocation>^Research.DocumeFB8.affiliationS</StreamLocation>
+<Data name="affiliationDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>institution</Value>
+</Value>
+<Value name="3">
+<Value>laboratory</Value>
+</Value>
+<Value name="4">
+<Value>location</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

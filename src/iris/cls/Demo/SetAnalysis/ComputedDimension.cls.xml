@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="IRIS" version="26">
+<Class name="Demo.SetAnalysis.ComputedDimension">
+<Super>%iKnow.DeepSee.Dimensions.Base</Super>
+<TimeCreated>63668,59646.849034</TimeCreated>
+
+<Method name="%ComputeIndexKey">
+<FormalSpec>pMemberKey:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set:$f(pMemberKey,":") pMemberKey = $piece(pMemberKey,":",*)
+	Quit $ZCRC(pMemberKey,7)
+]]></Implementation>
+</Method>
+
+<Method name="%OnGetComputedMembersInternal">
+<Description><![CDATA[
+Method combining the functionality of <method>%MemberSearch</method> and
+<method>%OnGetComputedMembersFiltered</method> to avoid having the same code twice.<br/>
+Returns entries of the form:<br/>
+		pMembers(n) = $lb(id, name, key)<br/>
+Expects any predefined dimension members to supplied with <var>pMemmbers</var> upfront!]]></Description>
+<Internal>1</Internal>
+<FormalSpec><![CDATA[&pMembers,pSearchKey:%String="",pRollupKey:%String="",&pRange:%String=""]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set tSC = $$$OK
+	try {
+		set tSQL = "SELECT ID, Name FROM Demo_SetAnalysis.SetDefinition WHERE DomainId = ?"
+		set:pSearchKey'="" tSQL = tSQL_" AND Name LIKE '%"_pSearchKey_"%'"
+		set tStatement = ##class(%SQL.Statement).%New()
+		set tSC = tStatement.%Prepare(tSQL)
+		quit:$$$ISERR(tSC)
+		set tResult = tStatement.%Execute(..%ikDomainId)
+		while tResult.%Next() {
+			set pMembers($i(pMembers)) = $lb(tResult.%Get("Name"), tResult.%Get("Name"), tResult.%Get("Name"))
+		}
+		
+	} catch (ex) {
+		set tSC = ex.AsStatus()
+	}
+	quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="%FindComputedMemberByKey">
+<FormalSpec>pKey:%String,*pFlag:%Boolean,*pMemberName:%String,*pMemberId:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set:$f(pKey,":") pKey = $piece(pKey,":",*)
+	set tSetObj = ##class(SetDefinition).NameIdxOpen(..%ikDomainId, pKey)
+	if $isobject(tSetObj) {
+		set pFlag=1, pMemberName=tSetObj.Name, pMemberId=pKey
+	} else {
+		set pFlag=0, pMemberName="", pMemberId=""
+	}
+	quit ..%ComputeBitset(pKey, .tIndexKey)
+]]></Implementation>
+</Method>
+
+<Method name="%OnComputeBitset">
+<Description>
+Do the actual work of building the bitset.</Description>
+<FormalSpec>pSpec:%String,pIndexKey:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set tSC = $$$OK
+	try {
+		set:$f(pSpec,":") pSpec = $piece(pSpec,":",*)
+		set tSetObj = ##class(SetDefinition).NameIdxOpen(..%ikDomainId, pSpec)
+		quit:tSetObj=""
+		
+		do tSetObj.GetFilter().ToBitstring(.tBits)
+		
+		kill $$$DeepSeeIndexGLVN(..%baseCube, ..%factNumber, pIndexKey)
+		merge $$$DeepSeeIndexGLVN(..%baseCube, ..%factNumber, pIndexKey) = tBits
+		
+		if (..%ikDomainType = "iKnow") {
+			set tIndexGlo = $name($$$DeepSeeIndexGLVN(..%baseCube, ..%factNumber, pIndexKey))
+			set tSC = ##class(%iKnow.DeepSee.CubeUtils).TranslateIKnowBitstring(..%baseCube, ..%ikMeasure, tIndexGlo)
+			quit:$$$ISERR(tSC)
+		}
+		
+	} catch (ex) {
+		set tSC = ex.AsStatus()
+	}
+	quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="%Count">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pCube:%String,pDimNo:%Integer,pHierNo:%Integer,pLevelNo:%Integer</FormalSpec>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[
+	set tSC = $$$OK, tCount = 0
+	try {
+		set tCube = $$$UPPER(pCube)
+		
+		// count number of pre-defined members
+		set tSC = ..%GetPredefinedMembers(.tMembers, pCube, pDimNo, pHierNo, pLevelNo)
+		quit:$$$ISERR(tSC)
+		set i = ""
+		for {
+			set i = $order(tMembers(i))
+			quit:i=""
+			set tCount = tCount + 1
+		}
+		quit:tCount
+		
+		// if none predefined, query domain
+		do ##class(%DeepSee.Utils).%GetDimensionFact(pCube, pDimNo, pHierNo, pLevelNo, .tFactName)
+		if (tFactName'="") {
+			set tIKMeasure = $g($$$DeepSeeMetaGLVN("cubes", tCube, "fact", "prop", tFactName, "iKnowMsr"))
+			if (tIKMeasure'="") {
+				set tDomainId = ##class(%iKnow.DeepSee.CubeUtils).GetDomainId(pCube, tIKMeasure)
+				if (tDomainId) {
+					&SQL(SELECT COUNT(*) INTO :tCount FROM Demo_SetAnalysis.SetDefinition WHERE DomainId = :tDomainId)
+					if (SQLCODE=0) {}
+					elseif (SQLCODE=100) { set tCount = 0 }
+					else { set tSC = ##class(%SYSTEM.Error).FromSQLCode(SQLCODE).Status  quit }
+				}	
+			}
+		}
+	} catch (ex) {
+		set tSC = ex.AsStatus()
+	}
+	quit tCount
+]]></Implementation>
+</Method>
+
+<Parameter name="CACHECOMPUTEDBITSET">
+<Default>NEVER</Default>
+</Parameter>
+
+<Method name="%ResolveKey">
+<Description>
+Resolve any special tokens or expression in a key value and return the result.</Description>
+<FormalSpec>pSpec:%String,*pRKey:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC = $$$OK
+	Set pRKey = $piece(pSpec,":",*)
+	Quit tSC
+]]></Implementation>
+</Method>
+</Class>
+</Export>

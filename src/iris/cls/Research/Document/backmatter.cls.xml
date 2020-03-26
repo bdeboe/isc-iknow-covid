@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="IRIS" version="26">
+<Class name="Research.Document.backmatter">
+<ProcedureBlock>1</ProcedureBlock>
+<Super>%Persistent,%XML.Adaptor,%JSON.Adaptor</Super>
+<TimeCreated>65457,63825.692118</TimeCreated>
+<Inheritance>left</Inheritance>
+
+<Parameter name="%JSONIGNOREINVALIDFIELD">
+<Default>1</Default>
+</Parameter>
+
+<Parameter name="%JSONIGNORENULL">
+<Type>BOOLEAN</Type>
+<Default>1</Default>
+</Parameter>
+
+<Property name="Document">
+<Type>Research.Document</Type>
+<Cardinality>parent</Cardinality>
+<Inverse>backmatter</Inverse>
+<Relationship>1</Relationship>
+</Property>
+
+<Property name="citespans">
+<Type>Research.Document.backmatter.citespans</Type>
+<Cardinality>children</Cardinality>
+<Inverse>backmatter</Inverse>
+<Relationship>1</Relationship>
+<Parameter name="%JSONFIELDNAME" value="cite_spans"/>
+</Property>
+
+<Property name="refspans">
+<Type>Research.Document.backmatter.refspans</Type>
+<Cardinality>children</Cardinality>
+<Inverse>backmatter</Inverse>
+<Relationship>1</Relationship>
+<Parameter name="%JSONFIELDNAME" value="ref_spans"/>
+</Property>
+
+<Property name="section">
+<Type>%String</Type>
+<Parameter name="%JSONFIELDNAME" value="section"/>
+<Parameter name="MAXLEN"/>
+</Property>
+
+<Property name="text">
+<Type>%String</Type>
+<Parameter name="%JSONFIELDNAME" value="text"/>
+<Parameter name="MAXLEN"/>
+</Property>
+
+<Storage name="Default">
+<Type>%Storage.Persistent</Type>
+<DataLocation>{%%PARENT}("backmatter")</DataLocation>
+<DefaultData>backmatterDefaultData</DefaultData>
+<IdLocation>^Research.DocumentC("backmatter")</IdLocation>
+<IndexLocation>^Research.Document.backmatterI</IndexLocation>
+<StreamLocation>^Research.Document.backmatterS</StreamLocation>
+<Data name="backmatterDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>citespans</Value>
+</Value>
+<Value name="3">
+<Value>refspans</Value>
+</Value>
+<Value name="4">
+<Value>section</Value>
+</Value>
+<Value name="5">
+<Value>text</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>
