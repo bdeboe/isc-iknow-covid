@@ -15,9 +15,70 @@
 ]]></Implementation>
 </Method>
 
+<Method name="Download">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pFiles:%String="biorxiv_medrxiv,comm_use_subset,noncomm_use_subset,custom_license",pUpdate="2020-03-27",pTempDir:%String=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set tSC = $$$OK
+	try {
+		set tSeparator = $s($$$isWINDOWS:"\",1:"/")
+		if pTempDir="" {
+			set pTempDir = $s($$$isWINDOWS:"C:\tmp\covid19\", 1:"/tmp/covid19/")
+		} elseif $e(pTempDir,*)'=tSeparator {
+			set pTempDir = pTempDir_tSeparator
+		}
+		do ##class(%File).CreateDirectoryChain(pTempDir)
+		
+		set tHttpRequest = ##class(%Net.HttpRequest).%New()
+		set tHttpRequest.Server = "ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com"
+		set tHttpRequest.Https = 1
+		set tHttpRequest.SSLConfiguration = "ISC.FeatureTracker.SSL.Config"
+		
+		set tFilePtr = ##class(%Stream.FileBinary).%New()
+		for i = 1:1:$l(pFiles,",") {
+			set tFilename = $piece(pFiles,",",i), tURL = pUpdate_"/"_tFilename_".tar.gz"
+			
+			w !!,"Downloading ",tURL," ..."
+			set tSC = tHttpRequest.Get(tURL)
+			quit:$$$ISERR(tSC)
+			if tHttpRequest.HttpResponse.StatusCode'=200 {
+				w !,"HTTP error code trying to fetch archive: ",tHttpRequest.HttpResponse.StatusCode
+				continue
+			}
+			
+			set tSC = tFilePtr.LinkToFile(pTempDir_tFilename_".tar.gz")
+			quit:$$$ISERR(tSC)
+			
+			set tSC = tFilePtr.CopyFromAndSave(tHttpRequest.HttpResponse.Data)
+			quit:$$$ISERR(tSC)
+			
+			w " (",$normalize(tFilePtr.FileBinarySize()/1024/1024,2),"MB)"
+			
+			w !,"Unzipping..."
+			do ##class(%File).CreateDirectoryChain(pTempDir_tFilename)
+			do ##class(Utils.FileBinaryTar).ExtractFile(tFilePtr.Filename, 1, pTempDir)
+			w " done"
+			
+			w !,"Loading into Research.FullDocument table.."
+			set tSC = ..LoadDir(pTempDir_tFilename,,,1)
+			quit:$$$ISERR(tSC)
+			
+			w !,"Cleaning up temporary files"
+			do ##class(%File).Delete(pTempDir_tFilename)
+		}
+		quit:$$$ISERR(tSC)
+		
+	} catch (ex) {
+		set tSC = ex.AsStatus()
+	}
+	quit tSC
+]]></Implementation>
+</Method>
+
 <Method name="LoadAll">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>pBaseDir:%String="C:\Users\bdeboe\Desktop\covid\"</FormalSpec>
+<FormalSpec>pBaseDir:%String="C:\Users\bdeboe\Desktop\covid\",pSkipExistingPaperID:%Boolean=1</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	set tSC = $$$OK
@@ -41,7 +102,7 @@
 
 <Method name="LoadDir">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>pDir:%String="C:\Users\bdeboe\Desktop\covid\pmc_custom_license\",pStore:%String(VALUELIST=",raw,full")="full",pMaxErrors:%Integer=100</FormalSpec>
+<FormalSpec>pDir:%String="C:\Users\bdeboe\Desktop\covid\pmc_custom_license\",pStore:%String(VALUELIST=",raw,full")="full",pMaxErrors:%Integer=100,pSkipExistingPaperID:%Boolean=1</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	set tSC = $$$OK
@@ -63,8 +124,16 @@
 		while tRS.%Next() {
 			set tRecord = ##class(Research.Document).%New()
 			do tFile.LinkToFile(tRS.Name)
+			
 			set tSC = tRecord.%JSONImport(tFile)
-			quit:$$$ISERR(tSC)
+			if $$$ISERR(tSC) {
+				write !,"Error reading JSON for paper ",tPaperID,", skipping"
+				set errors = errors+1
+				quit:errors>=pMaxErrors
+				continue
+			}
+			
+			set tPaperID = $e($piece(tFile.Filename,tSep,*),1,*-5)
 			
 			if (pStore = "raw") {
 				
@@ -74,10 +143,12 @@
 				
 			} else {
 				
+				continue:pSkipExistingPaperID&&##class(Research.FullDocument).idxPaperExists(tPaperID)
+				
 				set tFullDoc = ##class(Research.FullDocument).%New()
 				set tFullDoc.Source = $piece(pDir,tSep,*-1)
 				set tFullDoc.Filename = tFile.Filename
-				set tFullDoc.PaperID = $e($piece(tFile.Filename,tSep,*),1,*-5)
+				set tFullDoc.PaperID = tPaperID
 				set tFullDoc.Title = tRecord.metadata.title
 				
 				set tText = ""
@@ -86,7 +157,7 @@
 				if $l(tFullDoc.Title)>250 {
 					set tText = tFullDoc.Title
 					set tFullDoc.Title = $piece(tFullDoc.Title," ",1,25)
-					write !,"Bad title for paper ",tFullDoc.PaperID," - prepending to Abstract and truncating"
+					write !,"Bad title for paper ",tPaperID," - prepending to Abstract and truncating"
 				}
 				
 				for i = 1:1:tRecord.abstract.Count() {
@@ -104,7 +175,7 @@
 			}
 			
 			if $$$ISERR(tSC) {
-				write !,"Error writing paper ",$e($piece(tFile.Filename,tSep,*),1,*-5), /*" (",$system.Status.GetErrorText(tSC),")",*/ ", skipping"
+				write !,"Error writing paper ",tPaperID, /*" (",$system.Status.GetErrorText(tSC),")",*/ ", skipping"
 				set errors = errors+1
 				quit:errors>=pMaxErrors
 			} else {

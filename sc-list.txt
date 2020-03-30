@@ -11,3 +11,4 @@ Demo.SetAnalysis.pkg
 Research.Document.cls
 Research.Document.pkg
 Research.FullDocument.cls
+Utils.FileBinaryTar.cls
