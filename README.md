@@ -1,6 +1,6 @@
-# InterSystems iKnow COVID-19 Explorer
+# InterSystems iKnow CORD-19 Explorer
 
-A large set of research articles on COVID-19 and similar viruses [has been made available to the general public](https://pages.semanticscholar.org/coronavirus-research) for research and experimentation. At InterSystems, we are looking into ways to leverage our NLP technology (for which a standalone version is [available as open source](https://github.com/intersystems/iknow)) to make this dataset easer to browse and help people draw insights from it more quickly. 
+A large set of research articles on CORD-19 and similar viruses [has been made available to the general public](https://pages.semanticscholar.org/coronavirus-research) for research and experimentation. At InterSystems, we are looking into ways to leverage our NLP technology (for which a standalone version is [available as open source](https://github.com/intersystems/iknow)) to make this dataset easer to browse and help people draw insights from it more quickly. 
 
 This repository contains everything you need to get started.
 

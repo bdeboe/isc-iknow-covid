@@ -21,10 +21,15 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 	 
 	// retrieve capabilities
    	function getFeatures() {
-	   	$.get(hostURL($scope.ikDomain) + "Features",
-			   	function(data) {
+	     $.ajax({
+	     	url: hostURL($scope.ikDomain)+'Features', 
+	     	method: 'GET',
+		  	contentType: 'application/json; charset=UTF-8',
+		  	username: getUsername(),
+		  	password: getPassword(),
+	     	complete: function(data) {
 			    	$scope.Features = data;
-		        });
+	     	}});
    	}
    	getFeatures();
    	
@@ -34,6 +39,10 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 	 if (!domain) { domain = ':domain'; }
 	 return location.href.split('/').slice(0,-1).join('/')+'/saREST/Domain/'+domain+'/';
  };
+ 
+ // dummy authentication
+ getUsername = function() { return '_SYSTEM'; };
+ getPassword = function() { return 'SYS'; };
  
   $('#myTabs a').click(function (e) {
     e.preventDefault();
@@ -46,18 +55,25 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 	 
    $scope.getSets = function() {
      $scope.selectedSet = '';
-     $.get(hostURL($scope.ikDomain)+'Sets/Info', function(data) {
-	     $scope.totalInSets = data.TotalInSets;
-	     $scope.totalNotInSets = data.TotalNotInSets;
-	     $scope.totalSources = data.TotalSources;
-	     $scope.sets = data.Sets;
-	     var maxSetSize = 0;
-	     for (var i = 0; i < data.Sets.length; i++) {
-		     if (maxSetSize < data.Sets[i].Sources) maxSetSize = data.Sets[i].Sources;
-	     }
-	     $scope.totalSourcesDenominator = (maxSetSize < (0.6 * data.TotalSources)) ? ((maxSetSize > 0) ? (maxSetSize * 1.3) : 1) : data.TotalSources;
-		 $scope.$apply();
-      });
+     $.ajax({
+     	url: hostURL($scope.ikDomain)+'Sets/Info', 
+     	method: 'GET',
+	  	contentType: 'application/json; charset=UTF-8',
+	  	username: getUsername(),
+	  	password: getPassword(),
+     	complete: function(raw) {
+	     	var data = raw.responseJSON;
+		    $scope.totalInSets = data.TotalInSets;
+		    $scope.totalNotInSets = data.TotalNotInSets;
+		    $scope.totalSources = data.TotalSources;
+		    $scope.sets = data.Sets;
+		    var maxSetSize = 0;
+		    for (var i = 0; i < data.Sets.length; i++) {
+			    if (maxSetSize < data.Sets[i].Sources) maxSetSize = data.Sets[i].Sources;
+		    }
+		    $scope.totalSourcesDenominator = (maxSetSize < (0.6 * data.TotalSources)) ? ((maxSetSize > 0) ? (maxSetSize * 1.3) : 1) : data.TotalSources;
+			$scope.$apply();
+      }});
    }
 
    $scope.editSet= function(set, index) {
@@ -95,6 +111,8 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 	  		url: hostURL($scope.ikDomain)+'Sets/Update',
 	  		method: 'POST',
 	  		contentType: 'application/json; charset=UTF-8',
+		  	username: getUsername(),
+		  	password: getPassword(),
 	  		data: JSON.stringify( req ),
   			complete: function(data) {
 	      		$scope.getSets();
@@ -107,6 +125,8 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 	  		url: hostURL($scope.ikDomain)+'Sets/Delete',
 	  		method: 'POST',
 	  		contentType: 'application/json; charset=UTF-8',
+		  	username: getUsername(),
+		  	password: getPassword(),
 	  		data: JSON.stringify({ SetId: set.SetId }),
   			complete: function(data) {
 	      		$scope.getSets();
@@ -123,39 +143,58 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 	
     $scope.showSourcesBySet(set);
     
-    $.get(hostURL($scope.ikDomain)+'Sets/Overlaps/'+set.SetId, function(data) {
-     // for each set in overlap, update $scope.sets.Overlap 
-     var overlapLength = data.Overlaps.length;
-     var setLength = $scope.sets.length
-     for (var j = 0; j < setLength; j++) {
-	    $scope.sets[j].Overlap = '';
-	    $scope.sets[j].OverlapSet = '';
-	    if ($scope.sets[j].SetId == set.SetId) continue;
-	    
-	    for (var i = 0; i < overlapLength; i++) {
-          if (data.Overlaps[i].SetId == $scope.sets[j].SetId) {
-	      	$scope.sets[j].Overlap = data.Overlaps[i].Count;
-	      	$scope.sets[j].OverlapSet = set;
-	      }
-       }
-     }
-	 $scope.$apply();
-    });
+     $.ajax({
+     	url: hostURL($scope.ikDomain)+'Sets/Overlaps/'+set.SetId,
+     	method: 'GET',
+	  	contentType: 'application/json; charset=UTF-8',
+	  	username: getUsername(),
+	  	password: getPassword(),
+     	complete: function(data) {
+	     // for each set in overlap, update $scope.sets.Overlap 
+	     var overlapLength = data.Overlaps.length;
+	     var setLength = $scope.sets.length
+	     for (var j = 0; j < setLength; j++) {
+		    $scope.sets[j].Overlap = '';
+		    $scope.sets[j].OverlapSet = '';
+		    if ($scope.sets[j].SetId == set.SetId) continue;
+		    
+		    for (var i = 0; i < overlapLength; i++) {
+	          if (data.Overlaps[i].SetId == $scope.sets[j].SetId) {
+		      	$scope.sets[j].Overlap = data.Overlaps[i].Count;
+		      	$scope.sets[j].OverlapSet = set;
+		      }
+	       }
+	     }
+		 $scope.$apply();
+    }});
   }
   
   $scope.showSourcesBySet = function(set1, set2) {
     if (set2 == undefined) {
-	  	$scope.overlapSourcesRole = 'Sources in set \''+set1.Name+'\'';
-	  	$.get(hostURL($scope.ikDomain)+'Sources/Set/'+set1.SetId, function(data) {
-      		$scope.overlapSources = data.Sources;
-			$scope.$apply();
-    	});
+	  	 $scope.overlapSourcesRole = 'Sources in set \''+set1.Name+'\'';
+	     $.ajax({
+	     	url: hostURL($scope.ikDomain)+'Sources/Set/'+set1.SetId, 
+	     	method: 'GET',
+		  	contentType: 'application/json; charset=UTF-8',
+		  	username: getUsername(),
+		  	password: getPassword(),
+	     	complete: function(data) {
+	      		$scope.overlapSources = data.Sources;
+				$scope.$apply();
+    	}});
     } else {
 	    $scope.overlapSourcesRole = 'Overlapping sources for sets \''+set1.Name+'\' and \''+set2.Name+'\'';
-    	$.get(hostURL($scope.ikDomain)+'Sources/Set/'+set1.SetId+'/'+set2.SetId, function(data) {
-      		$scope.overlapSources = data.Sources;
-			$scope.$apply();
-    	});
+    	
+	     $.ajax({
+	     	url: hostURL($scope.ikDomain)+'Sources/Set/'+set1.SetId+'/'+set2.SetId,
+	     	method: 'GET',
+		  	contentType: 'application/json; charset=UTF-8',
+		  	username: getUsername(),
+		  	password: getPassword(),
+	     	complete: function(data) {
+	      		$scope.overlapSources = data.Sources;
+				$scope.$apply();
+	    	}});
     }
   }
   
@@ -178,6 +217,8 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 	  		url: hostURL($scope.ikDomain)+'Entities',
 	  		method: 'POST',
 	  		contentType: 'application/json; charset=UTF-8',
+		  	username: getUsername(),
+		  	password: getPassword(),
 	  		data: JSON.stringify({ 
  	 			filter: $scope.filterSet, 
   				blacklists: $scope.selectedBlacklists
@@ -199,6 +240,8 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 	  		url: hostURL($scope.ikDomain)+'Entities',
 	  		method: 'POST',
 	  		contentType: 'application/json; charset=UTF-8',
+		  	username: getUsername(),
+		  	password: getPassword(),
 	  		data: JSON.stringify({ 
 	  			entity: conceptValue,
  	 			filter: $scope.filterSet, 
@@ -216,6 +259,8 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 	  		url: hostURL($scope.ikDomain)+'CRCs',
 	  		method: 'POST',
 	  		contentType: 'application/json; charset=UTF-8',
+		  	username: getUsername(),
+		  	password: getPassword(),
 	  		data: JSON.stringify({ 
 	  			entity: entityValue,
  	 			filter: $scope.filterSet
@@ -232,6 +277,8 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 	  		url: hostURL($scope.ikDomain)+'Sentences',
 	  		method: 'POST',
 	  		contentType: 'application/json; charset=UTF-8',
+		  	username: getUsername(),
+		  	password: getPassword(),
 	  		data: JSON.stringify({ 
 	  			type: type,
 	  			value: value,
@@ -326,6 +373,8 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 	  		url: hostURL($scope.ikDomain)+'Sets/Save',
 	  		method: 'POST',
 	  		contentType: 'application/json; charset=UTF-8',
+		  	username: getUsername(),
+		  	password: getPassword(),
 	  		data: JSON.stringify({ 
 	  			SetId: $scope.SetId,
  	 			Name: name, 
@@ -349,6 +398,8 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 		  		url: hostURL($scope.ikDomain)+'Sentiment',
 		  		method: 'POST',
 		  		contentType: 'application/json; charset=UTF-8',
+			  	username: getUsername(),
+			  	password: getPassword(),
 		  		data: JSON.stringify({ 
 	  				blacklists: $scope.selectedBlacklists
 	  			}),
@@ -415,6 +466,8 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 		  		url: hostURL($scope.ikDomain)+'Sets/Save',
 		  		method: 'POST',
 		  		contentType: 'application/json; charset=UTF-8',
+			  	username: getUsername(),
+			  	password: getPassword(),
 		  		data: JSON.stringify({ 
 		  			SetId: $scope.SetId,
 	 	 			Name: $scope.SetName, 
@@ -429,10 +482,17 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 	  
 	  $scope.selectedSource = "";
 	  $scope.selectSource = function(srcId) {
-		  $.get(hostURL($scope.ikDomain)+'Sources/'+srcId, function(data) {
+		  
+	     $.ajax({
+	     	url: hostURL($scope.ikDomain)+'Sources/'+srcId, 
+	     	method: 'GET',
+		  	contentType: 'application/json; charset=UTF-8',
+		  	username: getUsername(),
+		  	password: getPassword(),
+	     	complete: function(data) {
 			  $scope.selectedSource = data;
 		  	  $('#fullSourceModal').modal('show');
-		  });
+		  }});
 	  };
  }]);
 
@@ -441,7 +501,13 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
  conceptsApp.controller('SourceController', ['$scope', function($scope) {
 	  
 	  this.getSources = function() {
-		$.get(hostURL($scope.ikDomain)+'Sources', function(data) {
+	     $.ajax({
+	     	url: hostURL($scope.ikDomain)+'Sources', 
+	     	method: 'GET',
+		  	contentType: 'application/json; charset=UTF-8',
+		  	username: getUsername(),
+		  	password: getPassword(),
+	     	complete: function(data) {
 			  $scope.srcData = data.Sources;
 			  // derive metadata from first row
 			  $scope.mdData = new Array();
@@ -451,7 +517,7 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 				  }
 			  }
 			  $scope.$apply();
-	  	});
+	  	}});
 	  }
 	  
 	  this.getSources();

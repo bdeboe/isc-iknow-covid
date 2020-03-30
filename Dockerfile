@@ -1,4 +1,4 @@
-FROM intersystems/iris-community:2020.1.0.209.0
+FROM store/intersystems/iris-community:2020.1.0.209.0
 
 # alternatively, start from a full IRIS kit and add your license key 
 # FROM intersystems/iris:2020.1.0.209.0
