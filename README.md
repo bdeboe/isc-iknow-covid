@@ -1,34 +1,8 @@
 # InterSystems iKnow CORD-19 Explorer
 
-A large set of research articles on CORD-19 and similar viruses [has been made available to the general public](https://pages.semanticscholar.org/coronavirus-research) for research and experimentation. At InterSystems, we are looking into ways to leverage our NLP technology (for which a standalone version is [available as open source](https://github.com/intersystems/iknow)) to make this dataset easer to browse and help people draw insights from it more quickly. 
+The CORD-19 corpus (Covid-19 Open Research Dataset) consists of over 30000 research articles on COVID-19 and similar viruses and is [available to the general public](https://pages.semanticscholar.org/coronavirus-research) for research and experimentation. At InterSystems, we are looking into ways to leverage our NLP technology (for which a standalone version is [available as open source](https://github.com/intersystems/iknow)) to make this dataset easer to browse and help people draw insights from it more quickly. 
 
-This repository contains everything you need to get started.
-
-## Setting up with Docker
-
-1. Clone the repository, navigate into its root directory and build the image:
-
-    ```
-    docker build --tag covid-19 .
-    ```
-
-    This will set up and load the full demo environment. For container size convenience, the script only downloads the noncomm_use_subset archive from the [SemanticScholar portal](https://pages.semanticscholar.org/coronavirus-research). If you'd like to process other / additional archives, you can easily update or extend the `Dockerfile` (`iris.script` will transparently pick up any archive).
-
-    :warning: Note that the image produced by this script becomes quite large, depending on which archive you're processing. This is because the underlying NLP libraries generously generate indices to support a broad variety of queries. You may have to extend your Docker installation's max storage footprint under Settings > Resources > Advanced and/or the [maximum container size](https://docs.docker.com/engine/reference/commandline/dockerd/#options-per-storage-driver).
-
-    Processing all archives together will require a database beyond the maximum size allowed by the Community Edition license terms. You can update the `Dockerfile` to start from a full IRIS image and put your iris.key file in the repository root, where the build script will pick it up.
-
-2. Start your container:
-
-    ```
-    docker run -d --name covid-19 -p 9091:51773 -p 9092:52773 covid-19
-    ```
-
-3. Access the index page at: http://localhost:9092/csp/user/menu.csp. 
-    When prompted for a password, use the default _SYSTEM/SYS combo
-	
-  ![Screenshot](https://github.com/bdeboe/isc-iknow-covid/blob/master/docs/img/screenshot-menu.jpg)
-
+This repository contains everything you need to get started, automating the process of downloading and processing the dataset and setting up a few demo environments to explore this vast research corpus. We very much value your suggestions on making these interfaces easier to navigate and any particular insights you gleaned through them. Please use the [issues](https://github.com/bdeboe/isc-iknow-covid/issues) section for all these and other kinds of feedback you'd like to share.
 
 ## Setting up on an existing IRIS instance
 
@@ -62,6 +36,32 @@ This repository contains everything you need to get started.
   ![Screenshot](https://github.com/bdeboe/isc-iknow-covid/blob/master/docs/img/screenshot-menu.jpg)
   
   
+## Setting up with Docker
+
+1. Clone the repository, navigate into its root directory and build the image:
+
+    ```
+    docker build --tag covid-19 .
+    ```
+
+    This will set up and load the full demo environment. For container size convenience, the script only downloads the noncomm_use_subset archive from the [SemanticScholar portal](https://pages.semanticscholar.org/coronavirus-research). If you'd like to process other / additional archives, you can easily update or extend the `Dockerfile` (`iris.script` will transparently pick up any archive).
+
+    :warning: Note that the image produced by this script becomes quite large, depending on which archive you're processing. This is because the underlying NLP libraries generously generate indices to support a broad variety of queries. You may have to extend your Docker installation's max storage footprint under Settings > Resources > Advanced and/or the [maximum container size](https://docs.docker.com/engine/reference/commandline/dockerd/#options-per-storage-driver).
+
+    Processing all archives together will require a database beyond the maximum size allowed by the Community Edition license terms. You can update the `Dockerfile` to start from a full IRIS image and put your iris.key file in the repository root, where the build script will pick it up.
+
+2. Start your container:
+
+    ```
+    docker run -d --name covid-19 -p 9091:51773 -p 9092:52773 covid-19
+    ```
+
+3. Access the index page at: http://localhost:9092/csp/user/menu.csp. 
+    When prompted for a password, use the default _SYSTEM/SYS combo
+	
+  ![Screenshot](https://github.com/bdeboe/isc-iknow-covid/blob/master/docs/img/screenshot-menu.jpg)
+
+
 ## Notes
 
 We've noticed that some JSON files have issues (or cause them) when indexed. For example, some articles have a full paragraph in their title field, which is of course inconvenient. The script will address many of these issues transparently and skip files we just can't deal with. Given that this is only a tiny fraction of the full dataset, that shouldn't be much of an issue!
@@ -69,3 +69,7 @@ We've noticed that some JSON files have issues (or cause them) when indexed. For
 More on the iKnow Natural Language Processing technology can be found [here](https://github.com/intersystems/iknow/wiki)
 
 If you run into trouble, please file an [issue](https://github.com/bdeboe/isc-iknow-covid/issues).
+
+### Credits
+
+- Thanks to @daimor for sharing an excellent ObjectScript [untar utility](https://github.com/daimor/isc-tar)
