@@ -30,7 +30,11 @@
   <h1>COVID-19 iKnow Content Navigator</h1>
 </div>
 
+<<<<<<< HEAD
 <p>Use the buttons below to access a number of demo interfaces to efficiently navigate the <a href="https://pages.semanticscholar.org/coronavirus-research" target="_new">coronavirus dataset <span class="glyphicon glyphicon-education" aria-hidden="true"> </span></a>, split into abstracts and full body text.</p>
+=======
+<p>From this launchpad, you can access a number of demo interfaces to efficiently navigate the <a href="https://pages.semanticscholar.org/coronavirus-research" target="_new">coronavirus dataset <span class="glyphicon glyphicon-education" aria-hidden="true"> </span></a>, split into abstracts and full body text.</p>
+>>>>>>> baf94aa688512fcf5f4aac059f1229e36d73d08e
 
 <table class="table">
 <tr>
