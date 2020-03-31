@@ -1,3 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="IRIS" version="26">
+<CSP name="nglib/bootstrap/css/bootstrap.css" application="/csp/covid/" default="1"><![CDATA[
 /*!
  * Bootstrap v3.3.5 (http://getbootstrap.com)
  * Copyright 2011-2015 Twitter, Inc.
@@ -6798,3 +6801,5 @@ button.close {
   }
 }
 /*# sourceMappingURL=bootstrap.css.map */
+]]></CSP>
+</Export>

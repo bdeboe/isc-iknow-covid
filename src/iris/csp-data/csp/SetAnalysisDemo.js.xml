@@ -1,3 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="IRIS" version="26">
+<CSP name="SetAnalysisDemo.js" application="/csp/covid/" default="1"><![CDATA[
 //Define angular modules for our app
 
 var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
@@ -541,3 +544,5 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 	  
     
   }]);
+]]></CSP>
+</Export>
