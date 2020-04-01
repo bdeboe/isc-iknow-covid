@@ -2,7 +2,7 @@
 <csp:class description="Start here">
 <html>
 <head>
-	<title>COVID-19 Open Research Dataset (CORD-19) content navigator</title>
+	<title>COVID-19 iKnow Content Navigator</title>
     <link rel="stylesheet" type="text/css" href="nglib/bootstrap/css/bootstrap.min.css" />
     <script type="text/javascript" src="nglib/jquery-2.0.3.min.js"></script>
     <script type="text/javascript" src="nglib/bootstrap/js/bootstrap.min.js"></script>
@@ -24,10 +24,10 @@
 <div class="col-md-10">
 
 <div class="page-header">
-  <h1>COVID-19 iKnow Content Navigator</h1>
+  <h1>COVID-19 iKnow Content Navigator <img src="portal/InterSystems IRIS.png" align="right" /></h1>
 </div>
 
-<p>Use the buttons below to access a number of demo interfaces to efficiently navigate the <a href="https://pages.semanticscholar.org/coronavirus-research" target="_new">coronavirus dataset <span class="glyphicon glyphicon-education" aria-hidden="true"> </span></a>, split into abstracts and full body text.</p>
+<p>Use the buttons below to access a number of demo interfaces to efficiently navigate the <a href="https://pages.semanticscholar.org/coronavirus-research" target="_new">COVID-19 Open Research Dataset (CORD-19) <span class="glyphicon glyphicon-education" aria-hidden="true"> </span></a>, split into abstracts and full body text.</p>
 
 <table class="table">
 <tr>
@@ -55,13 +55,13 @@ set domIDBody = ##class(COVID.Domains.BodyText).%GetDomainId()
 
 <p class="text-center"><button type="button" class="btn btn-success btn-lg" onclick="window.open('https://github.com/bdeboe/isc-iknow-covid/issues');" >Let us know what you think <span class="glyphicon glyphicon-comment" aria-hidden="true"> </span></button></p>
 
-<p>A little more on the actual interfaces:</p>
+<p>An overview of the InterSystems Natural Language Processing technology is captured in <a href="https://community.intersystems.com/post/new-video-natural-language-processing-intersystems-iris" target="_new">this intro video <span class="glyphicon glyphicon-film" aria-hidden="true"> </span></a>. If you'd like a little more background on the interfaces hosted on this system, the following articles provide more background:</p>
 <ul>
-<li>The <a href="https://community.intersystems.com/post/iknow-demo-apps-part-1-knowledge-portal" target="_new">Domain Explorer <span class="glyphicon glyphicon-globe" aria-hidden="true"> </span></a>, a.k.a. Knowledge Portal, is available by default in every IRIS kit and a straightforward entry point to browse the concepts identified by iKnow. This one is slightly customized and includes support for filtering along sets (see below) and browsing CCs, a feature that'll be included in the kit by 2020.3.</li>
-<li>The <a href="https://community.intersystems.com/post/iknow-demo-apps-part-2-set-analysis-demo" target="_new">Set Analysis Demo <span class="glyphicon glyphicon-tasks" aria-hidden="true"> </span></a> is a simple yet versatile demo that allows organizing a corpus into "sets" based on concept occurrence. Sets defined through this tool can be used as filters in the Domain Explorer.</li>
+<li>The <a href="https://community.intersystems.com/post/iknow-demo-apps-part-1-knowledge-portal" target="_new">Domain Explorer <span class="glyphicon glyphicon-globe" aria-hidden="true"> </span></a> (a.k.a. Knowledge Portal) is a straightforward entry point to browse the concepts and context identified by iKnow.</li>
+<li>The <a href="https://community.intersystems.com/post/iknow-demo-apps-part-2-set-analysis-demo" target="_new">Set Analysis Demo <span class="glyphicon glyphicon-tasks" aria-hidden="true"> </span></a> is a simple yet versatile demo that allows organizing a corpus into "sets" based on concept and CRC occurrence. Sets defined through this tool can be used as filters in the Domain Explorer.</li>
 <li>The <a href="https://community.intersystems.com/post/iknow-demo-apps-part-5-ifind-search-portal" target="_new">iFind Search Portal <span class="glyphicon glyphicon-search" aria-hidden="true"> </span></a> delivers mainstream search functionality and is based on an iFind index rather than iKnow domain. It supports word, phrase, entity and composite search, for which you'll find additional syntax suggestions <a href="https://docs.intersystems.com/irislatest/csp/documatic/%25CSP.Documatic.cls?PAGE=CLASS&LIBRARY=%25SYS&CLASSNAME=%25iFind.Index.Basic" target="_new">here</a> and <a href="https://docs.intersystems.com/irislatest/csp/docbook/Doc.View.cls?KEY=GSQLSRCH" target="_new">here</a>.</p>
 </ul>
-<p>If you are interested in REST API access to the underlying dataset, read more about the iKnow REST API <a href="https://community.intersystems.com/post/accessing-iknow-rest-apis-20171" target="_new">in this article <span class="glyphicon glyphicon-bookmark" aria-hidden="true"> </span></a> and consult the <a href="https://docs.intersystems.com/irislatest/csp/docbook/NLP-REST-API/index.html" target="_new">full OpenAPI (Swagger) spec <span class="glyphicon glyphicon-book" aria-hidden="true"> </span></a> or <script language="Cache" runat="server"> &html<<a href="/api/iKnow/v1/#($namespace)#/swagger" target="_new">raw local YAML <span class="glyphicon glyphicon-cog" aria-hidden="true"> </span></a>> </script>.
+<p>If you are interested in <b>REST API</b> access to the underlying dataset, read more about the iKnow REST API <a href="https://community.intersystems.com/post/accessing-iknow-rest-apis-20171" target="_new">in this article <span class="glyphicon glyphicon-bookmark" aria-hidden="true"> </span></a> and consult the <a href="https://docs.intersystems.com/irislatest/csp/docbook/NLP-REST-API/index.html" target="_new">full OpenAPI (Swagger) spec <span class="glyphicon glyphicon-book" aria-hidden="true"> </span></a> or <script language="Cache" runat="server"> &html<<a href="/api/iKnow/v1/#($namespace)#/swagger" target="_new">raw local YAML <span class="glyphicon glyphicon-cog" aria-hidden="true"> </span></a>> </script>.
 Don't hesitate to reach out through <a href="https://github.com/bdeboe/isc-iknow-covid/issues" target="_new">this GitHub repository <span class="glyphicon glyphicon-comment" aria-hidden="true"> </span></a> if you have ideas on making these easier to use and more effective to pull insights.</p>
 
 </div>

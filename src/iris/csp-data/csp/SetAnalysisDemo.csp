@@ -102,7 +102,7 @@
  <body style="padding: 15px">
   <div class="container" ng-controller="DomainController as dc">
      <ul class="nav nav-tabs" id="myTabs">
-       <li class=""><a href="SetAnalysisDemo.csp#table" data-toggle="tab" aria-expanded="false">Table</a></li>
+       <!-- li class=""><a href="SetAnalysisDemo.csp#table" data-toggle="tab" aria-expanded="false">Table</a></li-->
        <li class="active"><a href="SetAnalysisDemo.csp#concepts" data-toggle="tab" aria-expanded="true">Concepts</a></li>
        <li class=""><a href="SetAnalysisDemo.csp#sets" data-toggle="tab" aria-expanded="false">Sets</a></li>
        <li class="" ng-show="Features.HasSentiment"><a href="SetAnalysisDemo.csp#sentiment" data-toggle="tab" aria-expanded="false">Sentiment</a></li>
@@ -110,7 +110,7 @@
 
      <div id="myTabContent" class="tab-content" ng-controller="ConceptsController as cc">
        
-	   <div class="tab-pane fade" id="table" ng-controller="SourceController as sc" style="padding-top:10px;">
+	   <!--div class="tab-pane fade" id="table" ng-controller="SourceController as sc" style="padding-top:10px;">
 	    <div >
 	      <div class="well">
 
@@ -144,7 +144,7 @@
           <div class="row">
 		   <div class="col-md-4">
 		    <form class="form-inline">
-		     <select ng-model="filterSet" class="form-control input-sm" ng-change="refreshConcepts()">
+		     <select ng-model="filterSet" class="form-control input-sm" ng-change="refreshConcepts()" title="filter top concepts">
 		      <option value="">show all</option>
 		      <option ng-repeat="set in sets" ng-value="set.Name">Filter by set '{{set.Name}}'</option>
 		     </select>
@@ -157,8 +157,8 @@
 		    </form>
            </div>
            <div class="col-md-4">
-             <div class="input-group">
-              <input type="text" class="form-control input-sm" placeholder="Concept fragment" ng-model="autocomplete" ng-keyup="exploreKey($event)">
+             <div class="input-group" title="Search for entities or CRCs to define a set">
+              <input type="text" class="form-control input-sm" placeholder="Concept fragment" ng-model="term" ng-keyup="exploreKey($event)">
               <span class="input-group-btn">
                <button class="btn btn-default btn-sm" ng-click="explore()">Go!</button>
               </span>
@@ -168,7 +168,7 @@
              <div class="input-group">
               <input type="text" class="form-control input-sm" id="inputSet" placeholder="Set name" ng-model="SetName">
               <span class="input-group-btn">
-               <button type="submit" ng-click="saveSet(SetName)" class="btn btn-default btn-sm">Save</button>
+               <button type="submit" ng-click="saveSet(SetName)" class="btn btn-default btn-sm" title="add selected entity & CRC criteria to set definition">Save</button>
               </span>
              </div>
            </div> 
@@ -179,12 +179,12 @@
 	   	 <div class="row">
 		   <div class="col-md-4">
 	         <div class="panel panel-primary">
-	           <div class="panel-heading">Concepts</div>
+	           <div class="panel-heading">Top concepts</div>
 	           <div class="panel-body panel-body-table" style="max-height: 600px;overflow-y: scroll;">
                  <table class="table table-hover">
                     <tr ng-repeat="concept in concepts">  
 	                  <td ng-click="selectConcept(concept)">{{concept.EntityValue}}</td>
-	                  <td>{{concept.Frequency}}</td>
+	                  <td title="frequency">{{concept.Frequency}}</td>
 	                </tr>
 	             </table>
  		       </div>
@@ -198,8 +198,8 @@
 	             
 	     	        <div class="panel-heading">
 	     	          <ul class="nav nav-tabs">
-	     	            <li class="active"><a href="#tabi1" data-toggle="tab">Similar Entities</a></li>
-	                    <li><a href="#tabi2" data-toggle="tab">CRCs</a></li>
+	     	            <li class="active" title="Entities"><a href="#tabi1" data-toggle="tab">Similar Entities</a></li>
+	                    <li title="Concept-Relation-Concept triples"><a href="#tabi2" data-toggle="tab">CRCs</a></li>
 	     	          </ul>
 	    	        </div>
 	             
@@ -212,7 +212,7 @@
 	                       <tr ng-repeat="similarConcept in similar" ng-class="{'success': isSelected($index, 'entity')}">  
 		                     <td ng-click="selectSimilar(similarConcept, $index)">{{similarConcept.EntityValue}}</td>
 		                     <td>
-		                      <div ng-show="!similarConcept.canRemove">{{similarConcept.Frequency}}</div>
+		                      <div title="frequency" ng-show="!similarConcept.canRemove">{{similarConcept.Frequency}}</div>
 		                      <div ng-show="similarConcept.canRemove">
 		                       <span class="glyphicon glyphicon-trash" 
 		                       		 title="Remove from set" ng-click="removeFromSet('entity', similarConcept);"></span>
@@ -227,7 +227,7 @@
 	                       <tr ng-repeat="crc in crcs" ng-class="{'success': isSelected($index, 'crc')}">  
 		                     <td ng-click="selectCRC(crc, $index)">{{crc.Value}}</td>
 		                     <td>
-		                      <div ng-show="!crc.canRemove">{{crc.Frequency}}</div>
+		                      <div ng-show="!crc.canRemove" title="frequency">{{crc.Frequency}}</div>
 		                      <div ng-show="crc.canRemove">
 		                       <span class="glyphicon glyphicon-trash" 
 		                       		 title="Remove from set" ng-click="removeFromSet('crc', crc);"></span>
@@ -245,7 +245,7 @@
           </div> 
           <div class="col-md-4">
 	         <div class="panel panel-primary">
-	           <div class="panel-heading">Sentences</div>
+	           <div class="panel-heading">Sentences <span id="sentX"> </span></div>
 	           <div class="panel-body panel-body-table" style="max-height: 600px;overflow-y: scroll;">
                  <table class="table table-hover">
                     <tr ng-repeat="s in sentences" ng-click="selectSource(s.SourceId)">  
@@ -340,8 +340,8 @@
                      <table class="table table-hover">
 	                    <tr ng-repeat="source in overlapSources" ng-click="selectSource(source.SourceId)">  
 		                  <td>
-		                  {{source.SourceId}}: 
-		                    <div ng-bind-html="source.FullText"></div>
+		                    <b>{{source.Title}}</b>
+		                    <p><div ng-bind-html="source.FullText"></div></p>
 		                  </td>
 		                </tr>
 	                 </table>

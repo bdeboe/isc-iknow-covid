@@ -129,6 +129,11 @@ XData Style
     background-color: #4a9fe9;
 }
 
+
+h3 {
+	margin-top: 0px;
+}
+
 .opacity-50 {
 	opacity: 0.50;
 	filter: ~"alpha(opacity=50)"; //IE
@@ -140,6 +145,7 @@ XData Contents [ XMLNamespace = "http://www.intersystems.com/zen" ]
 {
 <page xmlns="http://www.intersystems.com/zen" 
 	 title="Domain Explorer" width="100%" height="100%">
+<html OnDrawContent="DrawDomainName" />
 <hgroup width="100%">
 <hgroup>
 <assistedText id="txtSearch" controlWidth="350px" controlClass="form-control"
@@ -148,12 +154,12 @@ controlType="custom"  isSuggestedDataComplete="true" triggerChars="" hideGhost="
   	onchange="zenPage.explore(zenThis.getValue(), true);return;" 
  	onkeyup="zenPage.onTermKeyUp();return;" />
  </hgroup>
- <html OnDrawContent="DrawDomainName" />
- <spacer width="20" />
- <html id="htmlFilterB" OnDrawContent="DrawButtons" />
- <html id="modalFilter" OnDrawContent="DrawFilterPane" enclosingClass="modal fade" />
- <html id="modalBlacklist" OnDrawContent="DrawBlacklistsPane" enclosingClass="modal fade" />
- <html id="modalSettings" OnDrawContent="DrawSettingsPane" enclosingClass="modal fade" />
+<spacer width="20" />
+<html id="htmlContext" OnDrawContent="DrawContext" />
+<html id="htmlFilterB" OnDrawContent="DrawButtons" />
+<html id="modalFilter" OnDrawContent="DrawFilterPane" enclosingClass="modal fade" />
+<html id="modalBlacklist" OnDrawContent="DrawBlacklistsPane" enclosingClass="modal fade" />
+<html id="modalSettings" OnDrawContent="DrawSettingsPane" enclosingClass="modal fade" />
 </hgroup>
 <spacer height="20" />
 <hgroup width="100%" cellVAlign="top">
@@ -256,7 +262,7 @@ ClientMethod inputTermClient(text) [ Language = javascript ]
 
 ClientMethod onTermKeyUp() [ Language = javascript ]
 {
-	if (zenEvent && ((zenEvent.keyCode==13) || (zenEvent.which==13))) {
+	if (zenEvent && ((zenEvent.keyCode==13) || (zenEvent.which==13) || (zenEvent.keyCode==9) || (zenEvent.which==9))) {
 		zenPage.explore(zen('txtSearch').getValue(), true);
 	}
 	return true;
@@ -277,6 +283,7 @@ ClientMethod refreshAll() [ Language = javascript ]
 	zen('htmlRel').refreshContents();
 	zen('htmlPaths').refreshContents();
 	zen('htmlFilterB').refreshContents();
+	zen('htmlContext').refreshContents();
 }
 
 Method DrawTopEntities(pSeed As %String) As %Status
@@ -300,8 +307,8 @@ Method DrawTopEntities(pSeed As %String) As %Status
 			set tSort = "frequency"
 		}
 		
-		set tPanes($i(tPanes)) = $lb(tSort, $s(..languageMode="ja":("Top Entities"), ..useStemming:("Top Stems"), 1:("Top Concepts")))
-		set tPanes($i(tPanes)) = $lb("dominance", $s(..languageMode="ja":("Dominant Entities"), ..useStemming:("Dominant Stems"), 1:("Dominant Concepts")))
+		set tPanes($i(tPanes)) = $lb(tSort, $s(..languageMode="ja":("Top Entities"), ..useStemming:("Top Stems"), 1:("Top Concepts")))_" by frequency"
+		set tPanes($i(tPanes)) = $lb("dominance", $s(..languageMode="ja":("Top Entities"), ..useStemming:("Top Stems"), 1:("Top Concepts")))_" by dominance"
 		
 		set tSC = ..DrawEntities(.tResult, "htmlTop", .tPanes)
 		quit:$$$ISERR(tSC)
@@ -411,10 +418,12 @@ Method DrawEntities(ByRef pEntities, pID As %String, ByRef pPanes) As %Status [ 
 			
 			set:$lv(tEntity) tEntity = $lg(tEntity) // dominance query fetches $lb's
 			
+			set tTitle = $s(tCurrent=1:"frequency - number of occurrences", pID="htmlRel":"proximity - expressing closeness of these concepts", 1:"dominance - expressing relevance of these concepts")
+			
 			write !,"<tr>"
 			write !,"<td><a href=""javascript:zenPage.explore('",$zcvt(tEntity,"O","JS"),"');"""_$s(..useStemming&&..useRepresentationForm:" title=""stem: "_$lg(tEntData,2)_"""",1:"")_">",$zcvt(tEntity,"O","HTML"),"</a></td>"
-			write !,"<td align=""right"">",$lg(tEntData,3),"</td>"
-			write:$ld(tEntData,4) !,"<td align=""right"">",$lg(tEntData,4),"</td>"
+			write !,"<td align=""right"" title=""",tTitle,""">",$lg(tEntData,3),"</td>"
+			write:$ld(tEntData,4) !,"<td align=""right"" title=""spread - number of articles this entity occurs in"">",$lg(tEntData,4),"</td>"
 			write !,"</tr>"
 			
 			set cnt = cnt+1
@@ -449,10 +458,10 @@ Method DrawPaths(pSeed As %String) As %Status
 		write !,"<div class=""panel with-nav-tabs panel-primary"">"
 	    write !,"<div class=""panel-heading"">"
 	    write !,"<ul class=""nav nav-tabs"">"
-	    write !,"<li",$s($g(%session.Data("t:htmlPaths"),1)=1:" class=""active""",1:""),"><a onclick=""zenPage.TogglePane('htmlPaths',1);"">"_("Sources")_"</a></li>"
-	    write !,"<li",$s($g(%session.Data("t:htmlPaths"),1)=2:" class=""active""",1:""),"><a onclick=""zenPage.TogglePane('htmlPaths',2);"">"_$case(..languageMode, "ja":("Entity Vectors"), :("Paths"))_"</a></li>"
-	    write:(..languageMode'="ja")&&'..useStemming !,"<li",$s($g(%session.Data("t:htmlPaths"),1)=3:" class=""active""",1:""),"><a onclick=""zenPage.TogglePane('htmlPaths',3);"">"_("CRCs")_"</a></li>"
-	    write:(..languageMode'="ja")&&'..useStemming !,"<li",$s($g(%session.Data("t:htmlPaths"),1)=4:" class=""active""",1:""),"><a onclick=""zenPage.TogglePane('htmlPaths',4);"">"_("CCs")_"</a></li>"
+	    write !,"<li",$s($g(%session.Data("t:htmlPaths"),1)=1:" class=""active""",1:"")," title=""Articles containing the selected entity""><a onclick=""zenPage.TogglePane('htmlPaths',1);"">"_("Articles")_"</a></li>"
+	    write !,"<li",$s($g(%session.Data("t:htmlPaths"),1)=2:" class=""active""",1:"")," title=""Paths (normalized sentences) containing the selected entity""><a onclick=""zenPage.TogglePane('htmlPaths',2);"">"_$case(..languageMode, "ja":("Entity Vectors"), :("Paths"))_"</a></li>"
+	    write:(..languageMode'="ja")&&'..useStemming !,"<li",$s($g(%session.Data("t:htmlPaths"),1)=3:" class=""active""",1:"")," title=""Concept-Relation-Concept triples including the selected entity""><a onclick=""zenPage.TogglePane('htmlPaths',3);"">"_("CRCs")_"</a></li>"
+	    write:(..languageMode'="ja")&&'..useStemming !,"<li",$s($g(%session.Data("t:htmlPaths"),1)=4:" class=""active""",1:"")," title=""Concept-Concept pairs including the selected entity""><a onclick=""zenPage.TogglePane('htmlPaths',4);"">"_("CCs")_"</a></li>"
 	    write !,"</ul>"
 	    write !,"</div>"
 	             
@@ -484,7 +493,9 @@ Method DrawPaths(pSeed As %String) As %Status
 			    set tSrcId = $lg(tSrcData,1)
 			    
 			    set tClickStyle = " style=""cursor:pointer;"" onclick=""zenPage.openSource("_tSrcId_");"""
-			    write !,"<tr><td",tClickStyle,">",tSrcId,"</td><td",tClickStyle,">",$lg(tSrcData,2),"</td><td",tClickStyle,">"
+			    write !,"<tr>"
+			    //write !,"<td",tClickStyle,">",tSrcId,"</td><td",tClickStyle,">",$lg(tSrcData,2),"</td>"
+			    write !,"<td",tClickStyle,">"
 				
 				// BDB824
 				do ..GetDefaultHighlightSpec(.tHighlight, "minimal", .tEntIds)
@@ -555,25 +566,25 @@ Method DrawPaths(pSeed As %String) As %Status
 			    if (tMaster'="") {
 				    write "<span class="""
 					write $s(tMaster=..term:"ik-selected", 1:"ik-concept")
-					write """ onclick=""zenPage.explore('",$zcvt(tMaster,"O","JS"),"');"">"
-					write $zcvt(tMaster,"O","HTML"),"</span>"
+					write """ onclick=""zenPage.explore('",$zcvt(tMaster,"O","JS"),"');"
+					write """>",$zcvt(tMaster,"O","HTML"),"</span>"
 			    }
 			    
 			    set tRelation = $lg(tCRCData,3)
 			    write "<span class="""
 				write $s(tRelation=..term:"ik-selected", 1:"ik-relation")
-				write """ onclick=""zenPage.explore('",$zcvt(tRelation,"O","JS"),"');"">"
-				write $zcvt(tRelation,"O","HTML"),"</span>"
+				//write """ onclick=""zenPage.explore('",$zcvt(tRelation,"O","JS"),"');"
+				write """>",$zcvt(tRelation,"O","HTML"),"</span>"
 			    
 			    set tSlave = $lg(tCRCData,4)
 			    if (tSlave'="") {
 				    write "<span class="""
 					write $s(tSlave=..term:"ik-selected", 1:"ik-concept")
-					write """ onclick=""zenPage.explore('",$zcvt(tSlave,"O","JS"),"');"">"
-					write $zcvt(tSlave,"O","HTML"),"</span>"
+					//write """ onclick=""zenPage.explore('",$zcvt(tSlave,"O","JS"),"');"
+					write """>",$zcvt(tSlave,"O","HTML"),"</span>"
 			    }
 			    
-			    write !,"</td><td>",$lg(tCRCData,5),"</td><td>",$lg(tCRCData,6),"</td>"
+			    write !,"</td><td title=""frequency - number of occurrences"">",$lg(tCRCData,5),"</td><td title=""spread - number of articles this CRC occurs in"">",$lg(tCRCData,6),"</td>"
 			    write !,"<td><span class=""glyphicon glyphicon-eye-open"" style=""margin-right:5px;"" onclick=""zenPage.drillSources('CRC:",$lg(tCRCData,1),"');""></span></td>"
 			    write !,"</tr>"
 			    
@@ -596,19 +607,19 @@ Method DrawPaths(pSeed As %String) As %Status
 			    if (tMaster'="") {
 				    write "<span class="""
 					write $s(tMaster=..term:"ik-selected", 1:"ik-concept")
-					write """ onclick=""zenPage.explore('",$zcvt(tMaster,"O","JS"),"');"">"
-					write $zcvt(tMaster,"O","HTML"),"</span>"
+					//write """ onclick=""zenPage.explore('",$zcvt(tMaster,"O","JS"),"');"
+					write """>",$zcvt(tMaster,"O","HTML"),"</span>"
 			    }
 			    
 			    set tSlave = $lg(tCCData,4)
 			    if (tSlave'="") {
 				    write "<span class="""
 					write $s(tSlave=..term:"ik-selected", 1:"ik-concept")
-					write """ onclick=""zenPage.explore('",$zcvt(tSlave,"O","JS"),"');"">"
-					write $zcvt(tSlave,"O","HTML"),"</span>"
+					//write """ onclick=""zenPage.explore('",$zcvt(tSlave,"O","JS"),"');"
+					write """>",$zcvt(tSlave,"O","HTML"),"</span>"
 			    }
 			    
-			    write !,"</td><td>",$lg(tCCData,5),"</td><td>",$lg(tCCData,6),"</td>"
+			    write !,"</td><td title=""frequency - number of occurrences"">",$lg(tCCData,5),"</td><td title=""spread - number of articles this CC occurs in"">",$lg(tCCData,6),"</td>"
 			    write !,"<td><span class=""glyphicon glyphicon-eye-open"" style=""margin-right:5px;"" onclick=""zenPage.drillSources('CC:",$lg(tCCData,1),":",$lg(tCCData,3),"');""></span></td>"
 			    write !,"</tr>"
 			    
@@ -658,9 +669,9 @@ Method DrawSourceListModal(pSeed As %String) As %Status
 		
 		set tDrillType = $piece(..drill,":",1)
 		set tDrill = $case(tDrillType,
-			"CRC":("Sources with selected CRCs"),
-			"CC":("Sources with selected CCs"),
-			"Similar":("Similar Sources"))
+			"CRC":("Articles with selected CRCs"),
+			"CC":("Articles with selected CCs"),
+			"Similar":("Similar Articles"))
 		
 		write !,"<div class=""modal-dialog"" style=""display: block; overflow-y: initial;"">"
 		write !,"<div class=""modal-content"">"
@@ -765,12 +776,13 @@ Method DrawSourceModal(pSeed As %String) As %Status
 		quit:('..domain)||'##class(%iKnow.Domain).%ExistsId(..domain)
 		
 		set tExternalID = ##class(%iKnow.Queries.SourceAPI).GetExternalId(..domain, ..source)
+		set tTitle = ##class(%iKnow.Queries.MetadataAPI).GetValue(..domain, "title", tExternalID)
 		
 		write !,"<div class=""modal-dialog"" style=""display: block; overflow-y: initial;"">"
 		write !,"<div class=""modal-content"">"
 		write !,"<div class=""modal-header"">"
 		write !,"<button type=""button"" class=""close"" onclick=""$('#modalSource').modal('hide');"">&times;</button>"
-		write !,"<h4 class=""modal-title"">",tExternalID,"</h4>"
+		write !,"<h4 class=""modal-title"">",tTitle,"</h4>"
 		write !,"</div>"
 		write !,"<div class=""modal-body"" style=""max-height: 400px; overflow-y: auto; line-height: 2; font-size: 12px;"">"
 		
@@ -832,12 +844,12 @@ Method DrawSourceModal(pSeed As %String) As %Status
 		write !,"</div>"
 		write !,"<div class=""modal-footer"" style=""padding: 5px;"">"
 		write !,"<button type=""button"" class=""btn btn-sm ",$s(pSeed="metadata":"btn-primary", 1:"btn-default"),""" style=""margin: 5px;"" onclick=""zen('modalSource').setProperty('seed','",$s(pSeed="metadata":"",1:"metadata"),"'); var sc = zen('modalSource').refreshContents(true);"" title="""_("show metadata")_""">"_("metadata")_"</button>"
-		write !,"<button type=""button"" class=""btn btn-sm btn-default"" style=""margin: 5px;"" onclick=""zenPage.drillSources('Similar:",..source,"'); $('#modalSource').modal('hide');"" title="""_("similar sources")_""">"_("similar")_"</button>"
-		write !,"<div class=""btn-group btn-group-sm"" role=""group"" style=""margin: 5px;"">"
-		write !,"<button type=""button"" class=""btn btn-default"" >"_("highlight")_": </button>"
-		write !,"<button type=""button"" class=""btn ",$s(pSeed="highlight":"btn-primary", 1:"btn-default"),""" onclick=""zenPage.toggleHighlighting('highlight');"" title="""_("toggle highlighting")_""">"_("indexing")_"</button>"
-		write !,"<button type=""button"" class=""btn ",$s(pSeed="dictionaries":"btn-primary", 1:"btn-default"),""" onclick=""zenPage.toggleHighlighting('dictionaries');"" title="""_("toggle highlighting")_""">"_("dictionaries")_"</button>"
-		write !,"</div>"
+		write !,"<button type=""button"" class=""btn btn-sm btn-default"" style=""margin: 5px;"" onclick=""zenPage.drillSources('Similar:",..source,"'); $('#modalSource').modal('hide');"" title="""_("similar articles")_""">"_("similar")_"</button>"
+		//write !,"<div class=""btn-group btn-group-sm"" role=""group"" style=""margin: 5px;"">"
+		//write !,"<button type=""button"" class=""btn btn-default"" >"_("highlight")_": </button>"
+		write !,"<button type=""button"" class=""btn btn-sm ",$s(pSeed="highlight":"btn-primary", 1:"btn-default"),""" onclick=""zenPage.toggleHighlighting('highlight');"" title="""_("toggle highlighting")_""">"_("indexing results")_"</button>"
+		//write !,"<button type=""button"" class=""btn ",$s(pSeed="dictionaries":"btn-primary", 1:"btn-default"),""" onclick=""zenPage.toggleHighlighting('dictionaries');"" title="""_("toggle highlighting")_""">"_("dictionaries")_"</button>"
+		//write !,"</div>"
 		write !,"<div class=""input-group pull-right input-sm"" style=""width: 100px;"">"
 		write !,"<input type=""text"" id=""txtPct"" class=""form-control input-sm"" placeholder=""100"" value=""",..summaryPct,""" onchange=""zenPage.summarize($('#txtPct').val());"" title="""_("Summary size")_""">"
 		write !,"<div class=""input-group-addon"">%</div>"
@@ -928,6 +940,12 @@ Method DrawDomainName(pSeed As %String) As %Status
 	quit $$$OK
 }
 
+Method DrawContext(pSeed As %String) As %Status
+{
+	write:..term'="" "<p>Looking for '",..term,"'"
+	quit $$$OK
+}
+
 Method DrawButtons(pSeed As %String) As %Status
 {
 	set tSC = $$$OK
@@ -937,13 +955,14 @@ Method DrawButtons(pSeed As %String) As %Status
 		
 		// draw buttons
 		write !,"<div class=""input-group pull-right"" role=""group"" style=""width: ",((($zlog(tSourceCount+2)\1)+1)*12+140),"px;"">"
-		write !,"<input type=""text"" class=""form-control"" title="" ",tSourceCount,$s(..filter="":("sources in domain"), 1:("sources selected by filter")),""" value=""",tSourceCount,""" readonly=""readonly"" />"
+		write !,"<input type=""text"" class=""form-control"" title="" ",tSourceCount," ",$s(..filter="":("articles in domain"), 1:("articles selected by filter")),""" value=""",tSourceCount,""" readonly=""readonly"" />"
 		write !,"<span class=""input-group-btn"">"
 		write !,"<button type=""button"" class=""btn ",$s(..filter="":"btn-default",1:"btn-success"),""" title="""_("Apply filters")_""" onclick=""$('#modalFilter').modal('show');""><span class=""glyphicon glyphicon-filter""></span></button>"
 		if (##class(%iKnow.Utils.MaintenanceAPI).HasBlackLists(+..domain) || ##class(%iKnow.Utils.MaintenanceAPI).HasBlackLists(0)) {
 			write !,"<button type=""button"" class=""btn ",$s(..blacklists="":"btn-default",1:"btn-success"),""" title="""_("Apply blacklists")_""" onclick=""$('#modalBlacklist').modal('show');""><span class=""glyphicon glyphicon-sunglasses""></span></button>"
 		}
 		write !,"<button type=""button"" class=""btn btn-default"" title="""_("Select domain and other settings")_""" onclick=""$('#modalSettings').modal('show');""><span class=""glyphicon glyphicon-cog""></span></button>"
+		write !,"<button type=""button"" class=""btn btn-default"" title="""_("More about this interface")_""" onclick=""window.open('https://community.intersystems.com/post/iknow-demo-apps-part-1-knowledge-portal');""><span class=""glyphicon glyphicon-info-sign""></span></button>"
 		write !,"</span>"
 		write !,"</div>"
 		
@@ -1463,6 +1482,11 @@ ClientMethod onloadHandler() [ Language = javascript ]
 	
 	if (zenPage.ShowInfo()) {
 		$('#modalInfo').modal('show');
+	}
+	
+	// if there is a term, make sure to overwrite the placeholder
+	if (zenPage.getProperty('term') != '') {
+		$('#txtSearch').children().first().children().filter('input').first().val(zenPage.getProperty('term'));
 	}
 }
 

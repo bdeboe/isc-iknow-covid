@@ -148,7 +148,7 @@ ClassMethod GetSourcesBySet(pDomainId As %Integer, pSetId As %Integer) As %Statu
 			set tHighlight("CRC", tCRCId) = "<b class=""entityInSet1"" title=""CRC '"_$zcvt(tCRC,"O","HTML")_"' indicates set '"_tSet.Name_"'"">"
 		}
 		
-		set tSC = ..GetSourcesInternal(pDomainId, tSet.GetFilter(),, .tHighlight, 0)
+		set tSC = ..GetSourcesInternal(pDomainId, tSet.GetFilter(),, .tHighlight, 1)
 		quit:$$$ISERR(tSC)
 		
 	} catch (ex) {
@@ -198,7 +198,7 @@ ClassMethod GetSourcesBySetOverlap(pDomainId As %Integer, pSetId1 As %Integer, p
 			set tHighlight("CRC", tCRCId) = "<b class=""entityInSet2"" title=""CRC '"_$zcvt(tCRC,"O","HTML")_"' indicates set '"_tSet2.Name_"'"">"
 		}
 		
-		set tSC = ..GetSourcesInternal(pDomainId, tFilter,, .tHighlight, 0)
+		set tSC = ..GetSourcesInternal(pDomainId, tFilter,, .tHighlight, 1)
 		quit:$$$ISERR(tSC)
 		
 	} catch (ex) {

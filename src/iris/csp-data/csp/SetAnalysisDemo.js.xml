@@ -232,9 +232,9 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
        		}
 	  });
       
-      if ($scope.autocomplete) {
-	      $scope.getSimilar($scope.autocomplete);
-		  $scope.getCRCs($scope.autocomplete);
+      if ($scope.term) {
+	      $scope.getSimilar($scope.term);
+		  $scope.getCRCs($scope.term);
       }
    }
          
@@ -276,6 +276,11 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
    };
    
    $scope.getSentences = function (type, value) {
+	  if (type=='crc') {
+	      $("#sentX").text('containing CRC '+value);
+	  } else {
+	  	  $("#sentX").text("containing '"+value+"'");
+	  }
 	  $.ajax({
 	  		url: hostURL($scope.ikDomain)+'Sentences',
 	  		method: 'POST',
@@ -295,7 +300,7 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
    };
    
    $scope.selectConcept = function (concept) {
-	 $scope.autocomplete = '';
+	 $scope.term = '';
      $scope.clearForm();
 	 $scope.getSimilar(concept.EntityValue);
 	 $scope.getCRCs(concept.EntityValue);
@@ -351,9 +356,9 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
   $scope.selectedBlacklists = [];
   
   $scope.explore = function() {
-    if (($scope.autocomplete != '') && ($scope.autocomplete.length >= $scope.Features.MinSearchLength)) {
-	    $scope.getSimilar($scope.autocomplete);
-	    $scope.getCRCs($scope.autocomplete);
+	if (($scope.term != '') && ($scope.term.length >= $scope.Features.MinSearchLength)) {
+	    $scope.getSimilar($scope.term);
+	    $scope.getCRCs($scope.term);
     }
   };
   
