@@ -97,15 +97,20 @@
 .with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > .active > a:focus {
     background-color: #4a9fe9;
 }
+
+h3 {
+	margin-top: 10px;
+}
    </style>
  </head>
  <body style="padding: 15px">
   <div class="container" ng-controller="DomainController as dc">
+     <h3>{{Features.Name}}</h3>
      <ul class="nav nav-tabs" id="myTabs">
        <!-- li class=""><a href="SetAnalysisDemo.csp#table" data-toggle="tab" aria-expanded="false">Table</a></li-->
        <li class="active"><a href="SetAnalysisDemo.csp#concepts" data-toggle="tab" aria-expanded="true">Concepts</a></li>
        <li class=""><a href="SetAnalysisDemo.csp#sets" data-toggle="tab" aria-expanded="false">Sets</a></li>
-       <li class="" ng-show="Features.HasSentiment"><a href="SetAnalysisDemo.csp#sentiment" data-toggle="tab" aria-expanded="false">Sentiment</a></li>
+       <!-- li class="" ng-show="Features.HasSentiment"><a href="SetAnalysisDemo.csp#sentiment" data-toggle="tab" aria-expanded="false">Sentiment</a></li-->
      </ul>
 
      <div id="myTabContent" class="tab-content" ng-controller="ConceptsController as cc">
@@ -144,16 +149,19 @@
           <div class="row">
 		   <div class="col-md-4">
 		    <form class="form-inline">
-		     <select ng-model="filterSet" class="form-control input-sm" ng-change="refreshConcepts()" title="filter top concepts">
-		      <option value="">show all</option>
-		      <option ng-repeat="set in sets" ng-value="set.Name">Filter by set '{{set.Name}}'</option>
-		     </select>
-		     <span class="dropdown">
- 		      <button id="btnBlacklist" class="btn btn-sm" ng-class="{ 'btn-success': (!!filterBL), 'btn-default': (!filterBL) }" ng-show="Features.Blacklists.length > 0" data-toggle="dropdown" aria-haspopup="true" style="margin-left:10px;"><span class="glyphicon glyphicon-sunglasses"></span></button>
-		      <ul class="dropdown-menu" aria-labelledby="btnBlacklist">
-		       <li ng-repeat="bl in Features.Blacklists" style="padding: 0px 10px;"><input type="checkbox" ng-click="toggleBL(bl.ID)" style="margin-right: 10px;" />{{bl.Name}}</li>
-		      </ul>
-		     </span>
+		     <div class="form-group">
+		      <label for="selFilter">Filter</label>
+ 		      <select id="selFilter" ng-model="filterSet" class="form-control input-sm" ng-change="refreshConcepts()" title="filter top concepts">
+		       <option value="">show all</option>
+		       <option ng-repeat="set in sets" ng-value="set.Name">Filter by set '{{set.Name}}'</option>
+		      </select>
+		     </div>
+		      <span class="dropdown">
+ 		       <button id="btnBlacklist" class="btn btn-sm" ng-class="{ 'btn-success': (!!filterBL), 'btn-default': (!filterBL) }" ng-show="Features.Blacklists.length > 0" data-toggle="dropdown" aria-haspopup="true" style="margin-left:10px;"><span class="glyphicon glyphicon-sunglasses"></span></button>
+		       <ul class="dropdown-menu" aria-labelledby="btnBlacklist">
+		        <li ng-repeat="bl in Features.Blacklists" style="padding: 0px 10px;"><input type="checkbox" ng-click="toggleBL(bl.ID)" style="margin-right: 10px;" />{{bl.Name}}</li>
+		       </ul>
+		      </span>
 		    </form>
            </div>
            <div class="col-md-4">

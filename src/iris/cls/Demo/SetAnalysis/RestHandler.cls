@@ -832,7 +832,8 @@ ClassMethod GetFeatures(pDomainId As %Integer) As %Status
 		set tJSON = ##class(%ZEN.proxyObject).%New()
 		
 		set tDomain = ##class(%iKnow.Domain).%OpenId(pDomainId)
-		if '$isobject(tDomain) { set tSC = $$$ERROR($$$IKNoDomainWithId, pDomainId) }
+		if '$isobject(tDomain) { set tSC = $$$ERROR($$$IKNoDomainWithId, pDomainId) quit }
+		set tJSON.Name = tDomain.Name
 		set tPackageName = tDomain.GetParameter($$$IKPPACKAGE)
 		set tJSON.HasTables = (tPackageName'="")
 		

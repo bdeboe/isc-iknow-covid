@@ -174,7 +174,7 @@ controlType="custom"  isSuggestedDataComplete="true" triggerChars="" hideGhost="
 <html id="modalSourceList" OnDrawContent="DrawSourceListModal" enclosingClass="modal fade" />
 <html id="modalSource" OnDrawContent="DrawSourceModal" enclosingClass="modal fade" onrefresh="zenPage.fixHighlighting(zen('modalSource').seed);" />
 
-<html id="modalInfo" enclosingClass="modal" >
+<!--html id="modalInfo" enclosingClass="modal" >
 <div class="modal-dialog">
 <div class="modal-content">
 <div class="modal-header">
@@ -190,7 +190,7 @@ About this page
 </div>
 </div>
 </div>
-</html>
+</html-->
 </page>
 }
 
@@ -961,7 +961,7 @@ Method DrawButtons(pSeed As %String) As %Status
 		if (##class(%iKnow.Utils.MaintenanceAPI).HasBlackLists(+..domain) || ##class(%iKnow.Utils.MaintenanceAPI).HasBlackLists(0)) {
 			write !,"<button type=""button"" class=""btn ",$s(..blacklists="":"btn-default",1:"btn-success"),""" title="""_("Apply blacklists")_""" onclick=""$('#modalBlacklist').modal('show');""><span class=""glyphicon glyphicon-sunglasses""></span></button>"
 		}
-		write !,"<button type=""button"" class=""btn btn-default"" title="""_("Select domain and other settings")_""" onclick=""$('#modalSettings').modal('show');""><span class=""glyphicon glyphicon-cog""></span></button>"
+		//write !,"<button type=""button"" class=""btn btn-default"" title="""_("Select domain and other settings")_""" onclick=""$('#modalSettings').modal('show');""><span class=""glyphicon glyphicon-cog""></span></button>"
 		write !,"<button type=""button"" class=""btn btn-default"" title="""_("More about this interface")_""" onclick=""window.open('https://community.intersystems.com/post/iknow-demo-apps-part-1-knowledge-portal');""><span class=""glyphicon glyphicon-info-sign""></span></button>"
 		write !,"</span>"
 		write !,"</div>"
