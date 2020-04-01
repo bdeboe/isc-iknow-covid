@@ -27,8 +27,8 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 		  	contentType: 'application/json; charset=UTF-8',
 		  	username: getUsername(),
 		  	password: getPassword(),
-	     	complete: function(data) {
-			    	$scope.Features = data;
+	     	complete: function(raw) {
+			    $scope.Features = raw.responseJSON;
 	     	}});
    	}
    	getFeatures();
@@ -114,7 +114,7 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 		  	username: getUsername(),
 		  	password: getPassword(),
 	  		data: JSON.stringify( req ),
-  			complete: function(data) {
+  			complete: function(raw) {
 	      		$scope.getSets();
        		}
 	  });
@@ -128,7 +128,7 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 		  	username: getUsername(),
 		  	password: getPassword(),
 	  		data: JSON.stringify({ SetId: set.SetId }),
-  			complete: function(data) {
+  			complete: function(raw) {
 	      		$scope.getSets();
        		}
 	  });
@@ -149,23 +149,24 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 	  	contentType: 'application/json; charset=UTF-8',
 	  	username: getUsername(),
 	  	password: getPassword(),
-     	complete: function(data) {
-	     // for each set in overlap, update $scope.sets.Overlap 
-	     var overlapLength = data.Overlaps.length;
-	     var setLength = $scope.sets.length
-	     for (var j = 0; j < setLength; j++) {
-		    $scope.sets[j].Overlap = '';
-		    $scope.sets[j].OverlapSet = '';
-		    if ($scope.sets[j].SetId == set.SetId) continue;
-		    
-		    for (var i = 0; i < overlapLength; i++) {
-	          if (data.Overlaps[i].SetId == $scope.sets[j].SetId) {
-		      	$scope.sets[j].Overlap = data.Overlaps[i].Count;
-		      	$scope.sets[j].OverlapSet = set;
-		      }
-	       }
-	     }
-		 $scope.$apply();
+     	complete: function(raw) {
+	     	 var data = raw.responseJSON;
+		     // for each set in overlap, update $scope.sets.Overlap 
+		     var overlapLength = data.Overlaps.length;
+		     var setLength = $scope.sets.length
+		     for (var j = 0; j < setLength; j++) {
+			    $scope.sets[j].Overlap = '';
+			    $scope.sets[j].OverlapSet = '';
+			    if ($scope.sets[j].SetId == set.SetId) continue;
+			    
+			    for (var i = 0; i < overlapLength; i++) {
+		          if (data.Overlaps[i].SetId == $scope.sets[j].SetId) {
+			      	$scope.sets[j].Overlap = data.Overlaps[i].Count;
+			      	$scope.sets[j].OverlapSet = set;
+			      }
+		       }
+		     }
+			 $scope.$apply();
     }});
   }
   
@@ -178,7 +179,8 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 		  	contentType: 'application/json; charset=UTF-8',
 		  	username: getUsername(),
 		  	password: getPassword(),
-	     	complete: function(data) {
+	     	complete: function(raw) {
+	     		var data = raw.responseJSON;
 	      		$scope.overlapSources = data.Sources;
 				$scope.$apply();
     	}});
@@ -191,7 +193,8 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 		  	contentType: 'application/json; charset=UTF-8',
 		  	username: getUsername(),
 		  	password: getPassword(),
-	     	complete: function(data) {
+	     	complete: function(raw) {
+	     		var data = raw.responseJSON;
 	      		$scope.overlapSources = data.Sources;
 				$scope.$apply();
 	    	}});
@@ -381,7 +384,7 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
   				Entities: ents,
   				CRCs: crcs
   			}),
-  			complete: function(data) {
+  			complete: function(raw) {
 	      		$scope.getSets();
        		}
 	  });
@@ -473,7 +476,7 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 	 	 			Name: $scope.SetName, 
 	  				Logic: $scope.SetLogic
 	  			}),
-	  			complete: function(data) {
+	  			complete: function(raw) {
 					$('#newSetModal').modal('hide');
 		      		$scope.getSets();
 	       		}
@@ -489,7 +492,8 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 		  	contentType: 'application/json; charset=UTF-8',
 		  	username: getUsername(),
 		  	password: getPassword(),
-	     	complete: function(data) {
+	     	complete: function(raw) {
+	     	  var data = raw.responseJSON;
 			  $scope.selectedSource = data;
 		  	  $('#fullSourceModal').modal('show');
 		  }});
@@ -507,7 +511,8 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 		  	contentType: 'application/json; charset=UTF-8',
 		  	username: getUsername(),
 		  	password: getPassword(),
-	     	complete: function(data) {
+	     	complete: function(raw) {
+	     	  var data = raw.responseJSON;
 			  $scope.srcData = data.Sources;
 			  // derive metadata from first row
 			  $scope.mdData = new Array();
