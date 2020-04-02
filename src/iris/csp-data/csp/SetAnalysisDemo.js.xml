@@ -93,7 +93,7 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
 		 for (i in set.CRCs) {
 			$scope.crcs[$scope.crcs.length] = { Value: set.CRCs[i], selected: 1, canRemove: true }; 
 		 }
-		$('#myTabs li:eq(1) a').tab('show');
+		$('#myTabs li:eq(0) a').tab('show');
 	  }
   }
   
