@@ -19,7 +19,7 @@ Parameter JSONFORMATPARAMS As STRING = "aelotwu";
 XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 {
 <Routes>
-
+<Route Url="/test" Method="GET" Call="Test" />
 <Route Url="/Domain/:domain/Features" Method="GET" Call="GetFeatures" />
 
 <Route Url="/Domain/:domain/Sources" Method="GET" Call="GetSources" />
@@ -43,6 +43,12 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 <Route Url="/Domain/:domain/Sentiment" Method="GET" Call="GetSentimental" />
 <Route Url="/Domain/:domain/Sentiment" Method="POST" Call="GetSentimental" />
 </Routes>
+}
+
+ClassMethod Test() As %Status
+{
+	write "OK"
+	quit $$$OK
 }
 
 /// Retrieves all sources (including full text and metadata) in the domain and prints them as JSON
