@@ -155,7 +155,6 @@ controlType="custom"  isSuggestedDataComplete="true" triggerChars="" hideGhost="
  	onkeyup="zenPage.onTermKeyUp();return;" />
  </hgroup>
 <spacer width="20" />
-<html id="htmlContext" OnDrawContent="DrawContext" />
 <html id="htmlFilterB" OnDrawContent="DrawButtons" />
 <html id="modalFilter" OnDrawContent="DrawFilterPane" enclosingClass="modal fade" />
 <html id="modalBlacklist" OnDrawContent="DrawBlacklistsPane" enclosingClass="modal fade" />
@@ -283,7 +282,6 @@ ClientMethod refreshAll() [ Language = javascript ]
 	zen('htmlRel').refreshContents();
 	zen('htmlPaths').refreshContents();
 	zen('htmlFilterB').refreshContents();
-	zen('htmlContext').refreshContents();
 }
 
 Method DrawTopEntities(pSeed As %String) As %Status
@@ -513,7 +511,7 @@ Method DrawPaths(pSeed As %String) As %Status
 			    
 			    write !,"</td>"
 			    write !,"<td><span class=""glyphicon glyphicon-eye-open"" style=""margin-right:5px;"" onclick=""zenPage.openSource(",tSrcId,");""></span></td>"
-			    write !,"<td><a href=""_iKnow.UI.IndexingResults.zen?$NAMESPACE="_$namespace_"&domain=",..domain,"&source=",tSrcId,""" target=""_new""><span class=""glyphicon glyphicon-play-circle"" style=""margin-right:5px;""></span></a></td>"
+			    //write !,"<td><a href=""_iKnow.UI.IndexingResults.zen?$NAMESPACE="_$namespace_"&domain=",..domain,"&source=",tSrcId,""" target=""_new""><span class=""glyphicon glyphicon-play-circle"" style=""margin-right:5px;""></span></a></td>"
 			    write !,"</tr>"
 			    
 			    set cnt = cnt+1
@@ -544,7 +542,7 @@ Method DrawPaths(pSeed As %String) As %Status
 
 			    write !,"</td>"
 			    write !,"<td><span class=""glyphicon glyphicon-eye-open"" style=""margin-right:5px;"" onclick=""zenPage.openSource(",tSourceId,");""></span></td>"
-			    write !,"<td><span class=""glyphicon glyphicon-play-circle"" style=""margin-right:5px;"" onclick=""location.href='_iKnow.UI.IndexingResults.zen?domain=",..domain,"&source=",tSourceId,"';""></span></td>"
+			    //write !,"<td><span class=""glyphicon glyphicon-play-circle"" style=""margin-right:5px;"" onclick=""location.href='_iKnow.UI.IndexingResults.zen?domain=",..domain,"&source=",tSourceId,"';""></span></td>"
 			    write !,"</tr>"
 			    
 			    set cnt = cnt+1
@@ -748,7 +746,7 @@ Method DrawSourceListModal(pSeed As %String) As %Status
 			
 			write !,"</td>"
 		    write !,"<td><span class=""glyphicon glyphicon-eye-open"" style=""margin-right:5px;"" onclick=""zenPage.openSource(",tSrcId,");""></span></td>"
-		    write !,"<td><span class=""glyphicon glyphicon-play-circle"" style=""margin-right:5px;"" onclick=""location.href='_iKnow.UI.IndexingResults.zen?domain=",..domain,"&source=",tSrcId,"';""></span></td>"
+		    //write !,"<td><span class=""glyphicon glyphicon-play-circle"" style=""margin-right:5px;"" onclick=""location.href='_iKnow.UI.IndexingResults.zen?domain=",..domain,"&source=",tSrcId,"';""></span></td>"
 			write !,"</tr>"
 			
 			set tCnt = tCnt+1
@@ -940,22 +938,25 @@ Method DrawDomainName(pSeed As %String) As %Status
 	quit $$$OK
 }
 
-Method DrawContext(pSeed As %String) As %Status
-{
-	write:..term'="" "<p>Looking for '",..term,"'"
-	quit $$$OK
-}
-
 Method DrawButtons(pSeed As %String) As %Status
 {
 	set tSC = $$$OK
 	try {
+		if ..term'="" {
+			write !,"<div class=""btn-group"" role=""group"">"
+			write !,"<button type=""button"" class=""btn btn-default"" disabled=""disabled"">Exploring '",$zcvt(..term,"O","HTML"),"'",$s(..filter="":"",1:" with filter"),"</button>"
+			write !,"<button type=""button"" class=""btn btn-default"" onclick=""zenPage.quickFilter('Entity:",$zcvt(..term,"O","JS"),"');"" title=""Add to filter context""><span class=""glyphicon glyphicon-pushpin""> </span></button>"
+			write !,"</div>"
+		}
+		
 		set tSourceCount = ##class(%iKnow.Queries.SourceAPI).GetCountByDomain(..domain, ..GetFilter())
 		set:tSourceCount<0 tSourceCount = ""
 		
 		// draw buttons
-		write !,"<div class=""input-group pull-right"" role=""group"" style=""width: ",((($zlog(tSourceCount+2)\1)+1)*12+140),"px;"">"
-		write !,"<input type=""text"" class=""form-control"" title="" ",tSourceCount," ",$s(..filter="":("articles in domain"), 1:("articles selected by filter")),""" value=""",tSourceCount,""" readonly=""readonly"" />"
+		//write !,"<div class=""input-group pull-right"" role=""group"" style=""width: ",((($zlog(tSourceCount+2)\1)+1)*12+140),"px;"">"
+		write !,"<div class=""input-group pull-right"" role=""group"" style=""width: ",((($zlog(tSourceCount+2)\1)+1)*12+180),"px;"">"
+		//write !,"<input type=""text"" class=""form-control"" title="" ",tSourceCount," ",$s(..filter="":("articles in domain"), 1:("articles selected by filter")),""" value=""",tSourceCount,""" readonly=""readonly"" />"
+		write !,"<input type=""text"" class=""form-control"" title="" ",tSourceCount," ",$s(..filter="":("articles in domain"), 1:("articles selected by filter")),""" value=""",tSourceCount," articles"" readonly=""readonly"" />"
 		write !,"<span class=""input-group-btn"">"
 		write !,"<button type=""button"" class=""btn ",$s(..filter="":"btn-default",1:"btn-success"),""" title="""_("Apply filters")_""" onclick=""$('#modalFilter').modal('show');""><span class=""glyphicon glyphicon-filter""></span></button>"
 		if (##class(%iKnow.Utils.MaintenanceAPI).HasBlackLists(+..domain) || ##class(%iKnow.Utils.MaintenanceAPI).HasBlackLists(0)) {
@@ -1185,6 +1186,9 @@ DrawFilter(tFilter, tLocation)
 				set tString = tString_", ..."
 			}
 			write !,"<button type=""button"" class=""btn btn-sm btn-info"" style=""margin-right: 5px; padding: 2px 10px; text-align: left;"">External IDs: ",tString,"</button>"
+		} elseif (tFilter.%IsA("COVID.Utils.ContainsEntityFilter")) {
+			set e = tFilter.GetEntities(.c)
+			write !,"<button type=""button"" class=""btn btn-sm btn-info"" style=""margin-right: 5px; padding: 2px 10px; text-align: left;"">Entit",$s(c>1:"ies",1:"y"),": ",$lg(e,1),$s(c>1:", "_$lg(e,2)_$s(c>2:", ...",1:""),1:""),"</button>"
 		} else {
 			try {
 				set tLabel = tFilter.GetLabel()
@@ -1387,6 +1391,8 @@ Method AddFilter(pString As %String, pLocation As %String = "") As %Status [ Zen
 			set tNewFilter = ##class(%iKnow.Filters.ExternalIdFilter).%New(..domain, $piece(pString,":",2,*))
 		} elseif $piece(pString,":",1) = "Range" {
 			set tNewFilter = ##class(%iKnow.Filters.SourceIdRangeFilter).%New(..domain, $piece(pString,":",2), $piece(pString,":",3))
+		} elseif $piece(pString,":",1) = "Entity" {
+			set tNewFilter = ##class(COVID.Utils.ContainsEntityFilter).%New(..domain, $lfs($piece(pString,":",2,*)))
 		} elseif $piece(pString,":",1) = "Custom" {
 			set tNewFilter = ..CreateCustomFilter($piece(pString,":",2), $piece(pString,":",3,*))
 		} else {
@@ -1451,6 +1457,13 @@ Method GetSubFilter(pFilter As %iKnow.Filters.GroupFilter, pLocation As %String)
 		do pFilter.ReplaceSubFilterAt(tLocNum, tGroupFilter)
 		quit tGroupFilter
 	}
+}
+
+ClientMethod quickFilter(spec) [ Language = javascript ]
+{
+	var sc = zenPage.AddFilter(spec, $('#hidLocation').val()); 
+	zen('modalFilter').refreshContents();
+	zenPage.refreshAll();
 }
 
 ClientMethod updateFilter(seed) [ Language = javascript ]
