@@ -9,7 +9,7 @@ Parameter AUTONS = 1;
 
 Parameter DOMAIN = "%iKnow";
 
-Parameter RESOURCE = "%Development";
+Parameter RESOURCE = "%Development,COVID_READER";
 
 Parameter CSSINCLUDES = "bootstrap-3-3-5/dist/css/bootstrap.min.css";
 
