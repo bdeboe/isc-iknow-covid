@@ -5,6 +5,8 @@
 COVID.Domains.Abstracts.cls
 COVID.Domains.BodyText.cls
 COVID.KnowledgePortal.cls
+COVID.Utils.ContainsCCFilter.cls
+COVID.Utils.ContainsCRCFilter.cls
 COVID.Utils.ContainsEntityFilter.cls
 COVID.Utils.cls
 Demo.SearchPortal.pkg

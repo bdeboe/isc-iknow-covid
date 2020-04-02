@@ -583,7 +583,8 @@ Method DrawPaths(pSeed As %String) As %Status
 			    }
 			    
 			    write !,"</td><td title=""frequency - number of occurrences"">",$lg(tCRCData,5),"</td><td title=""spread - number of articles this CRC occurs in"">",$lg(tCRCData,6),"</td>"
-			    write !,"<td><span class=""glyphicon glyphicon-eye-open"" style=""margin-right:5px;"" onclick=""zenPage.drillSources('CRC:",$lg(tCRCData,1),"');""></span></td>"
+			    write !,"<td><span class=""glyphicon glyphicon-eye-open"" style=""margin-right:5px;"" onclick=""zenPage.drillSources('CRC:",$lg(tCRCData,1),"');"" title=""Drill to articles with this CRC""></span></td>"
+			    write !,"<td><span class=""glyphicon glyphicon-pushpin"" style=""margin-right:5px;"" onclick=""zenPage.quickFilter('CRC:",$zcvt(tMaster,"O","JS"),":",$zcvt(tRelation,"O","JS"),":",$zcvt(tSlave,"O","JS"),"');"" title=""Add CRC to filter context""></span></td>"
 			    write !,"</tr>"
 			    
 			    set cnt = cnt+1
@@ -618,7 +619,8 @@ Method DrawPaths(pSeed As %String) As %Status
 			    }
 			    
 			    write !,"</td><td title=""frequency - number of occurrences"">",$lg(tCCData,5),"</td><td title=""spread - number of articles this CC occurs in"">",$lg(tCCData,6),"</td>"
-			    write !,"<td><span class=""glyphicon glyphicon-eye-open"" style=""margin-right:5px;"" onclick=""zenPage.drillSources('CC:",$lg(tCCData,1),":",$lg(tCCData,3),"');""></span></td>"
+			    write !,"<td><span class=""glyphicon glyphicon-eye-open"" style=""margin-right:5px;"" onclick=""zenPage.drillSources('CC:",$lg(tCCData,1),":",$lg(tCCData,3),"');"" title=""Drill to articles containing this CC""></span></td>"
+			    write !,"<td><span class=""glyphicon glyphicon-pushpin"" style=""margin-right:5px;"" onclick=""zenPage.quickFilter('CC:",$zcvt(tMaster,"O","JS"),":",$zcvt(tSlave,"O","JS"),"');"" title=""Add CC to filter context""></span></td>"
 			    write !,"</tr>"
 			    
 			    set cnt = cnt+1
@@ -677,7 +679,7 @@ Method DrawSourceListModal(pSeed As %String) As %Status
 		write !,"<button type=""button"" class=""close"" onclick=""$('#modalSourceList').modal('hide');"">&times;</button>"
 		write !,"<h4 class=""modal-title"">",tDrill,"</h4>"
 		write !,"</div>"
-		write !,"<div class=""modal-body"" style=""padding: 0px;"">"
+		write !,"<div class=""modal-body"" style=""padding: 0px; overflow-y: auto; max-height: 450px;"">"
 		write !,"<table class=""table table-hover"">"
 		
 		if (tDrillType="CRC") {
@@ -998,6 +1000,7 @@ Method DrawFilterPane(pSeed As %String) As %Status
 		
 		set tFilterType = $piece(pSeed,":",1)
 		set:tFilterType="" tFilterType = "MD"
+		write !,"<label for=""selFilterType"">New filter</label>"
 		write !,"<select id=""selFilterType"" class=""form-control input-sm"" required=""true"" style=""vertical-align: top;"" onchange=""zenPage.updateFilter($('#selFilterType').val());"" >"
 		write !,"<option value=""MD""",$s(tFilterType="MD":" selected=""selected""", 1:""),">"_("metadata")_"</option>"
 		write !,"<option value=""SQL""",$s(tFilterType="SQL":" selected=""selected""", 1:""),">SQL</option>"
@@ -1021,6 +1024,7 @@ Method DrawFilterPane(pSeed As %String) As %Status
 			write !,"<select id=""selMDField"" class=""form-control input-sm"" required=""true"" onchange=""zenPage.updateFilter('MD:'+$('#selMDField').val());"" >"
 			set tSC = ##class(%iKnow.Queries.MetadataAPI).GetFields(.tFields, ..domain)
 			quit:$$$ISERR(tSC)
+			set:tFieldName="" tFieldName = $lg($g(tFields(1)),2)
 			set i = ""
 			for {
 				set i = $order(tFields(i),1,tFieldData)
@@ -1030,7 +1034,8 @@ Method DrawFilterPane(pSeed As %String) As %Status
 			write !,"</select>"
 			
 			set tOperator = $piece(pSeed,":",3)
-			do ##class(%iKnow.Queries.MetadataAPI).GetFieldInfo(..domain, tFieldName, .tInfo)
+			set tSC = ##class(%iKnow.Queries.MetadataAPI).GetFieldInfo(..domain, tFieldName, .tInfo)
+			quit:$$$ISERR(tSC)
 			write !,"<select id=""selMDOperator"" class=""form-control input-sm"" required=""true"" onchange=""zenPage.updateFilter('MD:'+$('#selMDField').val()+':'+$('#selMDOperator').val()+':'+$('#selMDValue').val());"" >"
 			for i = 1:1:$l(tInfo("SupportedOperators"),",") {
 				set tOp = $piece(tInfo("SupportedOperators"),",",i)
@@ -1038,7 +1043,7 @@ Method DrawFilterPane(pSeed As %String) As %Status
 			}
 			write !,"</select>"
 			
-			if (tOperator'="IS NULL") && (tOperator'="IS NOT NULL") {
+			if (tOperator'="IS NULL") && (tOperator'="IS NOT NULL") && (tOperator'="") {
 				set tValue = $s(tOperator="BETWEEN":$piece(pSeed,":",4), 1:$piece(pSeed,":",4,*))
 				if (tInfo("HasBitstringStorage")) {
 					write !,"<select id=""selMDValue"" class=""form-control input-sm"" required=""true"" >"
@@ -1103,7 +1108,7 @@ Method DrawFilterPane(pSeed As %String) As %Status
 		}
 		
 		write !,"<button type=""button"" class=""btn btn-primary btn-sm"" style=""vertical-align: top;"" onclick=""zenPage.submitFilter();"">"_("add")_"</button>"
-		write !,"</form>"
+		write !,"</form> <!-- OK -->"
 		
 		
 		write !,"</div>"
@@ -1189,6 +1194,10 @@ DrawFilter(tFilter, tLocation)
 		} elseif (tFilter.%IsA("COVID.Utils.ContainsEntityFilter")) {
 			set e = tFilter.GetEntities(.c)
 			write !,"<button type=""button"" class=""btn btn-sm btn-info"" style=""margin-right: 5px; padding: 2px 10px; text-align: left;"">Entit",$s(c>1:"ies",1:"y"),": ",$lg(e,1),$s(c>1:", "_$lg(e,2)_$s(c>2:", ...",1:""),1:""),"</button>"
+		} elseif (tFilter.%IsA("COVID.Utils.ContainsCRCFilter")) {
+			write !,"<button type=""button"" class=""btn btn-sm btn-info"" style=""margin-right: 5px; padding: 2px 10px; text-align: left;"">CRC",$s($ll(tFilter.CRCs)>1:"s",1:""),": ",$lts($lg(tFilter.CRCs,1),"~"),$s($ll(tFilter.CRCs)>1:", ...",1:""),"</button>"
+		} elseif (tFilter.%IsA("COVID.Utils.ContainsCCFilter")) {
+			write !,"<button type=""button"" class=""btn btn-sm btn-info"" style=""margin-right: 5px; padding: 2px 10px; text-align: left;"">CC",$s($ll(tFilter.CCs)>1:"s",1:""),": ",$lts($lg(tFilter.CCs,1),"~"),$s($ll(tFilter.CCs)>1:", ...",1:""),"</button>"
 		} else {
 			try {
 				set tLabel = tFilter.GetLabel()
@@ -1393,6 +1402,10 @@ Method AddFilter(pString As %String, pLocation As %String = "") As %Status [ Zen
 			set tNewFilter = ##class(%iKnow.Filters.SourceIdRangeFilter).%New(..domain, $piece(pString,":",2), $piece(pString,":",3))
 		} elseif $piece(pString,":",1) = "Entity" {
 			set tNewFilter = ##class(COVID.Utils.ContainsEntityFilter).%New(..domain, $lfs($piece(pString,":",2,*)))
+		} elseif $piece(pString,":",1) = "CRC" {
+			set tNewFilter = ##class(COVID.Utils.ContainsCRCFilter).%New(..domain, $lb($lfs($piece(pString,":",2,*))))
+		} elseif $piece(pString,":",1) = "CC" {
+			set tNewFilter = ##class(COVID.Utils.ContainsCCFilter).%New(..domain, $lb($lfs($piece(pString,":",2,*))))
 		} elseif $piece(pString,":",1) = "Custom" {
 			set tNewFilter = ..CreateCustomFilter($piece(pString,":",2), $piece(pString,":",3,*))
 		} else {
