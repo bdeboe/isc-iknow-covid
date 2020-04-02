@@ -526,7 +526,7 @@ ClassMethod GetSetInfo(pDomainId As %Integer) As %Status
 		set:$data(%response) %response.ContentType="application/json"
 		set tJSON = ##class(%ZEN.proxyObject).%New()
 		
-		set tSQL = "SELECT ID FROM Demo_SetAnalysis.SetDefinition WHERE DomainId = "_pDomainId_" AND CreatedBy = '"_$username_"'"
+		set tSQL = "SELECT ID FROM Demo_SetAnalysis.SetDefinition WHERE DomainId = "_pDomainId //_" AND CreatedBy = '"_$username_"'"
 		set tResult = ##class(%SQL.Statement).%ExecDirect(,tSQL)
 		set tJSON.Sets = ##class(%ListOfObjects).%New()
 		while tResult.%Next() {
