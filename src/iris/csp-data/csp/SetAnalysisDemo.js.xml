@@ -41,8 +41,8 @@ var conceptsApp = angular.module('conceptsApp', ['ngSanitize']);
  };
  
  // dummy authentication
- getUsername = function() { return '_SYSTEM'; };
- getPassword = function() { return 'SYS'; };
+ getUsername = function() { return 'COVID'; };
+ getPassword = function() { return 'covid19'; };
  
   $('#myTabs a').click(function (e) {
     e.preventDefault();

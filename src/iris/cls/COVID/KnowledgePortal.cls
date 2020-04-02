@@ -936,7 +936,7 @@ Method TogglePane(pID As %String, pPane As %Integer) As %Status [ ZenMethod ]
 
 Method DrawDomainName(pSeed As %String) As %Status
 {
-	write:..domain "<h3>",##class(%iKnow.Domain).%OpenId(..domain).Name,"</h3>"
+	write:..domain "<h3>Domain Explorer: ",##class(%iKnow.Domain).%OpenId(..domain).Name,"</h3>"
 	quit $$$OK
 }
 
