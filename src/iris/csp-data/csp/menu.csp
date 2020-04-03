@@ -40,14 +40,14 @@
 set domIDAbstracts = ##class(COVID.Domains.Abstracts).%GetDomainId()
 set domIDBody = ##class(COVID.Domains.BodyText).%GetDomainId()
 
-&html<<td><button type="button" class="btn btn-info" onclick="window.open('COVID.KnowledgePortal.zen?domain=#(domIDAbstracts)#');" >Domain Explorer <span class="glyphicon glyphicon-globe" aria-hidden="true"> </span></button></td>>
-&html<<td><button type="button" class="btn btn-primary" onclick="window.open('COVID.KnowledgePortal.zen?domain=#(domIDBody)#');" >Domain Explorer <span class="glyphicon glyphicon-globe" aria-hidden="true"> </span></button></td>>
+&html<<td><button type="button" class="btn btn-lg btn-info" onclick="window.open('COVID.KnowledgePortal.zen?domain=#(domIDAbstracts)#');" >Domain Explorer <span class="glyphicon glyphicon-globe" aria-hidden="true"> </span></button></td>>
+&html<<td><button type="button" class="btn btn-lg btn-primary" onclick="window.open('COVID.KnowledgePortal.zen?domain=#(domIDBody)#');" >Domain Explorer <span class="glyphicon glyphicon-globe" aria-hidden="true"> </span></button></td>>
 &html<</tr><tr>>
-&html<<td><button type="button" class="btn btn-info" onclick="window.open('SetAnalysisDemo.csp?#(domIDAbstracts)#');" >Set Analysis <span class="glyphicon glyphicon-tasks" aria-hidden="true"> </span></button></td>>
-&html<<td><button type="button" class="btn btn-primary" onclick="window.open('SetAnalysisDemo.csp?#(domIDBody)#');" >Set Analysis <span class="glyphicon glyphicon-tasks" aria-hidden="true"> </span></button></td>>
+&html<<td><button type="button" class="btn btn-sm btn-default" onclick="window.open('SetAnalysisDemo.csp?#(domIDAbstracts)#');" >Set Analysis <span class="glyphicon glyphicon-tasks" aria-hidden="true"> </span></button></td>>
+&html<<td><button type="button" class="btn btn-sm btn-default" onclick="window.open('SetAnalysisDemo.csp?#(domIDBody)#');" >Set Analysis <span class="glyphicon glyphicon-tasks" aria-hidden="true"> </span></button></td>>
 &html<</tr><tr>>
-&html<<td><button type="button" class="btn btn-info" onclick="window.open('Demo.SearchPortal.HomeA.zen');" >iFind Search Portal <span class="glyphicon glyphicon-search" aria-hidden="true"> </span></button></td>>
-&html<<td><button type="button" class="btn btn-primary" onclick="window.open('Demo.SearchPortal.Home.zen');" >iFind Search Portal <span class="glyphicon glyphicon-search" aria-hidden="true"> </span></button></td>>
+&html<<td><button type="button" class="btn btn-sm btn-default" onclick="window.open('Demo.SearchPortal.HomeA.zen');" >iFind Search Portal <span class="glyphicon glyphicon-search" aria-hidden="true"> </span></button></td>>
+&html<<td><button type="button" class="btn btn-sm btn-default" onclick="window.open('Demo.SearchPortal.Home.zen');" >iFind Search Portal <span class="glyphicon glyphicon-search" aria-hidden="true"> </span></button></td>>
 
 </script>
 </tr>
@@ -57,7 +57,7 @@ set domIDBody = ##class(COVID.Domains.BodyText).%GetDomainId()
 
 <p>An overview of the InterSystems Natural Language Processing (aka iKnow) technology is captured in <a href="https://community.intersystems.com/post/new-video-natural-language-processing-intersystems-iris" target="_new">this intro video <span class="glyphicon glyphicon-film" aria-hidden="true"> </span></a>. If you'd like a little more background on the interfaces hosted on this system, the following articles provide more background:</p>
 <ul>
-<li>The <a href="https://community.intersystems.com/post/iknow-demo-apps-part-1-knowledge-portal" target="_new">Domain Explorer <span class="glyphicon glyphicon-globe" aria-hidden="true"> </span></a> (a.k.a. Knowledge Portal) is a straightforward entry point to browse the concepts and context identified by iKnow.</li>
+<li>The <a href="https://community.intersystems.com/post/iknow-demo-apps-part-1-knowledge-portal" target="_new">Domain Explorer <span class="glyphicon glyphicon-globe" aria-hidden="true"> </span></a> (aka Knowledge Portal) is a straightforward entry point to browse the concepts and context identified by iKnow.</li>
 <li>The <a href="https://community.intersystems.com/post/iknow-demo-apps-part-2-set-analysis-demo" target="_new">Set Analysis Demo <span class="glyphicon glyphicon-tasks" aria-hidden="true"> </span></a> is a simple yet versatile demo that allows organizing a corpus into "sets" based on concept and CRC occurrence. Sets defined through this tool can be used as filters in the Domain Explorer.</li>
 <li>The <a href="https://community.intersystems.com/post/iknow-demo-apps-part-5-ifind-search-portal" target="_new">iFind Search Portal <span class="glyphicon glyphicon-search" aria-hidden="true"> </span></a> delivers mainstream search functionality and is based on an iFind index rather than iKnow domain. It supports word, phrase, entity and composite search, for which you'll find additional syntax suggestions <a href="https://docs.intersystems.com/irislatest/csp/documatic/%25CSP.Documatic.cls?PAGE=CLASS&LIBRARY=%25SYS&CLASSNAME=%25iFind.Index.Basic" target="_new">here</a> and <a href="https://docs.intersystems.com/irislatest/csp/docbook/Doc.View.cls?KEY=GSQLSRCH" target="_new">here</a>.</p>
 </ul>

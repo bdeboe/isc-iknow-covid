@@ -897,5 +897,27 @@ ClassMethod OnPreDispatch(pUrl As %String, pMethod As %String, ByRef pContinue A
 	quit ..ErrorHandler(tSC)
 }
 
+/// This method performs a basic access check. You can override this to add additional checks.
+ClassMethod AccessCheck(Output pAuthorized As %Boolean = 0) As %Status
+{
+    #dim tSC As %Status = $$$OK
+    #dim e As %Exception.AbstractException
+    
+    #dim tAccess As %String
+    
+			$$$SysLog(3,"OAuth2","[%CSP.REST]","AccessCheck")
+    Try {
+        #; Check that the effective user ( could be unknown user ) can access this resource
+        Set tAccess=$SYSTEM.Security.Check($Piece($zu(90,21,$namespace),"^",4))
+        If tAccess["READ"
+        {
+           Set pAuthorized=1
+        }
+    } catch (e) {
+        Set tSC=e.AsStatus()
+    }
+    Quit tSC
+}
+
 }
 

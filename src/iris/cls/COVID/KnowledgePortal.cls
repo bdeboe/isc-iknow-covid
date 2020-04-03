@@ -776,7 +776,8 @@ Method DrawSourceModal(pSeed As %String) As %Status
 		quit:('..domain)||'##class(%iKnow.Domain).%ExistsId(..domain)
 		
 		set tExternalID = ##class(%iKnow.Queries.SourceAPI).GetExternalId(..domain, ..source)
-		set tTitle = ##class(%iKnow.Queries.MetadataAPI).GetValue(..domain, "title", tExternalID)
+		set tTitle = ##class(%iKnow.Queries.MetadataAPI).GetValue(..domain, "Title", tExternalID)
+		set tPaperID = ##class(%iKnow.Queries.MetadataAPI).GetValue(..domain, "PaperID", tExternalID)
 		
 		write !,"<div class=""modal-dialog"" style=""display: block; overflow-y: initial;"">"
 		write !,"<div class=""modal-content"">"
@@ -843,7 +844,8 @@ Method DrawSourceModal(pSeed As %String) As %Status
 		
 		write !,"</div>"
 		write !,"<div class=""modal-footer"" style=""padding: 5px;"">"
-		write !,"<button type=""button"" class=""btn btn-sm ",$s(pSeed="metadata":"btn-primary", 1:"btn-default"),""" style=""margin: 5px;"" onclick=""zen('modalSource').setProperty('seed','",$s(pSeed="metadata":"",1:"metadata"),"'); var sc = zen('modalSource').refreshContents(true);"" title="""_("show metadata")_""">"_("metadata")_"</button>"
+		//write !,"<button type=""button"" class=""btn btn-sm ",$s(pSeed="metadata":"btn-primary", 1:"btn-default"),""" style=""margin: 5px;"" onclick=""zen('modalSource').setProperty('seed','",$s(pSeed="metadata":"",1:"metadata"),"'); var sc = zen('modalSource').refreshContents(true);"" title="""_("show metadata")_""">"_("metadata")_"</button>"
+		write !,"<button type=""button"" class=""btn btn-sm btn-default"" style=""margin: 5px;"" onclick=""window.open('https://cord-19.apps.allenai.org/paper/"_tPaperID_"');"" title=""Show full paper"">Original paper</button>"
 		write !,"<button type=""button"" class=""btn btn-sm btn-default"" style=""margin: 5px;"" onclick=""zenPage.drillSources('Similar:",..source,"'); $('#modalSource').modal('hide');"" title="""_("similar articles")_""">"_("similar")_"</button>"
 		//write !,"<div class=""btn-group btn-group-sm"" role=""group"" style=""margin: 5px;"">"
 		//write !,"<button type=""button"" class=""btn btn-default"" >"_("highlight")_": </button>"
@@ -965,6 +967,7 @@ Method DrawButtons(pSeed As %String) As %Status
 			write !,"<button type=""button"" class=""btn ",$s(..blacklists="":"btn-default",1:"btn-success"),""" title="""_("Apply blacklists")_""" onclick=""$('#modalBlacklist').modal('show');""><span class=""glyphicon glyphicon-sunglasses""></span></button>"
 		}
 		//write !,"<button type=""button"" class=""btn btn-default"" title="""_("Select domain and other settings")_""" onclick=""$('#modalSettings').modal('show');""><span class=""glyphicon glyphicon-cog""></span></button>"
+		write !,"<button type=""button"" class=""btn btn-default"" title=""Clear exploration and filter context"" onclick=""zenPage.resetFilter();zenPage.explore('');""><span class=""glyphicon glyphicon-remove""></span></button>"
 		write !,"<button type=""button"" class=""btn btn-default"" title="""_("More about this interface")_""" onclick=""window.open('https://community.intersystems.com/post/iknow-demo-apps-part-1-knowledge-portal');""><span class=""glyphicon glyphicon-info-sign""></span></button>"
 		write !,"</span>"
 		write !,"</div>"
@@ -1000,8 +1003,8 @@ Method DrawFilterPane(pSeed As %String) As %Status
 		
 		set tFilterType = $piece(pSeed,":",1)
 		set:tFilterType="" tFilterType = "MD"
-		write !,"<label for=""selFilterType"">New filter</label>"
-		write !,"<select id=""selFilterType"" class=""form-control input-sm"" required=""true"" style=""vertical-align: top;"" onchange=""zenPage.updateFilter($('#selFilterType').val());"" >"
+		write !,"<label for=""selMDField"">New filter</label>"
+		/*write !,"<select id=""selFilterType"" class=""form-control input-sm"" required=""true"" style=""vertical-align: top;"" onchange=""zenPage.updateFilter($('#selFilterType').val());"" >"
 		write !,"<option value=""MD""",$s(tFilterType="MD":" selected=""selected""", 1:""),">"_("metadata")_"</option>"
 		write !,"<option value=""SQL""",$s(tFilterType="SQL":" selected=""selected""", 1:""),">SQL</option>"
 		write !,"<option value=""SrcId""",$s(tFilterType="SrcId":" selected=""selected""", 1:""),">"_("Source IDs")_"</option>"
@@ -1018,7 +1021,7 @@ Method DrawFilterPane(pSeed As %String) As %Status
 		}
 		
 		write !,"</select>"
-		
+		*/
 		if (tFilterType="MD") {
 			set tFieldName = $piece(pSeed,":",2)
 			write !,"<select id=""selMDField"" class=""form-control input-sm"" required=""true"" onchange=""zenPage.updateFilter('MD:'+$('#selMDField').val());"" >"
@@ -1029,11 +1032,13 @@ Method DrawFilterPane(pSeed As %String) As %Status
 			for {
 				set i = $order(tFields(i),1,tFieldData)
 				quit:i=""
+				continue:$lg(tFieldData,2)="DateIndexed"
 				write !,"<option",$s(tFieldName=$lg(tFieldData,2):" selected=""selected""",1:""),">",$lg(tFieldData,2),"</option>"
 			}
 			write !,"</select>"
 			
 			set tOperator = $piece(pSeed,":",3)
+			set:tOperator="" tOperator="="
 			set tSC = ##class(%iKnow.Queries.MetadataAPI).GetFieldInfo(..domain, tFieldName, .tInfo)
 			quit:$$$ISERR(tSC)
 			write !,"<select id=""selMDOperator"" class=""form-control input-sm"" required=""true"" onchange=""zenPage.updateFilter('MD:'+$('#selMDField').val()+':'+$('#selMDOperator').val()+':'+$('#selMDValue').val());"" >"
