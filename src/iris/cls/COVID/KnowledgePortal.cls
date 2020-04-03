@@ -938,7 +938,7 @@ Method TogglePane(pID As %String, pPane As %Integer) As %Status [ ZenMethod ]
 
 Method DrawDomainName(pSeed As %String) As %Status
 {
-	write:..domain "<h3>Domain Explorer: ",##class(%iKnow.Domain).%OpenId(..domain).Name,"</h3>"
+	write:..domain "<h3>Domain Explorer: ",##class(%iKnow.Domain).%OpenId(..domain).Name,$case($username,"UnknownUser":"", :" (logged in as "_$username_")"),"</h3>"
 	quit $$$OK
 }
 
@@ -1027,7 +1027,7 @@ Method DrawFilterPane(pSeed As %String) As %Status
 			write !,"<select id=""selMDField"" class=""form-control input-sm"" required=""true"" onchange=""zenPage.updateFilter('MD:'+$('#selMDField').val());"" >"
 			set tSC = ##class(%iKnow.Queries.MetadataAPI).GetFields(.tFields, ..domain)
 			quit:$$$ISERR(tSC)
-			set:tFieldName="" tFieldName = $lg($g(tFields(1)),2)
+			set:tFieldName="" tFieldName = $lg($g(tFields(2)),2)
 			set i = ""
 			for {
 				set i = $order(tFields(i),1,tFieldData)
