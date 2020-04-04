@@ -305,8 +305,8 @@ Method DrawTopEntities(pSeed As %String) As %Status
 			set tSort = "frequency"
 		}
 		
-		set tPanes($i(tPanes)) = $lb(tSort, $s(..languageMode="ja":("Top Entities"), ..useStemming:("Top Stems"), 1:("Top Concepts")))_" by frequency"
-		set tPanes($i(tPanes)) = $lb("dominance", $s(..languageMode="ja":("Top Entities"), ..useStemming:("Top Stems"), 1:("Top Concepts")))_" by dominance"
+		set tPanes($i(tPanes)) = $lb(tSort, $s(..languageMode="ja":("Top Entities"), ..useStemming:("Top Stems"), 1:("Top Entities")))_" by frequency"
+		set tPanes($i(tPanes)) = $lb("dominance", $s(..languageMode="ja":("Top Entities"), ..useStemming:("Top Stems"), 1:("Top Entities")))_" by dominance"
 		
 		set tSC = ..DrawEntities(.tResult, "htmlTop", .tPanes)
 		quit:$$$ISERR(tSC)
@@ -350,7 +350,7 @@ Method DrawRelEntities(pSeed As %String) As %Status
 	try {
 		quit:('..domain)||'##class(%iKnow.Domain).%ExistsId(..domain)
 		
-		set:(..languageMode'="ja")&&'..useStemming tPanes($i(tPanes)) = $lb("related", ("Related Concepts"))
+		set:(..languageMode'="ja")&&'..useStemming tPanes($i(tPanes)) = $lb("related", ("Related Entities"))
 		set tPanes($i(tPanes)) = $lb("proximity", ("Proximity Profile"))
 		
 		set tPaneIndex = $g(%session.Data("t:htmlRel"),1)
@@ -510,7 +510,7 @@ Method DrawPaths(pSeed As %String) As %Status
 				}
 			    
 			    write !,"</td>"
-			    write !,"<td><span class=""glyphicon glyphicon-eye-open"" style=""margin-right:5px;"" onclick=""zenPage.openSource(",tSrcId,");""></span></td>"
+			    write !,"<td><span class=""glyphicon glyphicon-eye-open"" style=""margin-right:5px;"" onclick=""zenPage.openSource(",tSrcId,");"" title=""Open article""></span></td>"
 			    //write !,"<td><a href=""_iKnow.UI.IndexingResults.zen?$NAMESPACE="_$namespace_"&domain=",..domain,"&source=",tSrcId,""" target=""_new""><span class=""glyphicon glyphicon-play-circle"" style=""margin-right:5px;""></span></a></td>"
 			    write !,"</tr>"
 			    
@@ -541,7 +541,7 @@ Method DrawPaths(pSeed As %String) As %Status
 				write ##class(%iKnow.Queries.SentenceAPI).GetHighlighted(..domain, tSentenceId, .tHighlight)
 
 			    write !,"</td>"
-			    write !,"<td><span class=""glyphicon glyphicon-eye-open"" style=""margin-right:5px;"" onclick=""zenPage.openSource(",tSourceId,");""></span></td>"
+			    write !,"<td><span class=""glyphicon glyphicon-eye-open"" style=""margin-right:5px;"" onclick=""zenPage.openSource(",tSourceId,");"" title=""Open article""></span></td>"
 			    //write !,"<td><span class=""glyphicon glyphicon-play-circle"" style=""margin-right:5px;"" onclick=""location.href='_iKnow.UI.IndexingResults.zen?domain=",..domain,"&source=",tSourceId,"';""></span></td>"
 			    write !,"</tr>"
 			    
@@ -584,7 +584,7 @@ Method DrawPaths(pSeed As %String) As %Status
 			    
 			    write !,"</td><td title=""frequency - number of occurrences"">",$lg(tCRCData,5),"</td><td title=""spread - number of articles this CRC occurs in"">",$lg(tCRCData,6),"</td>"
 			    write !,"<td><span class=""glyphicon glyphicon-eye-open"" style=""margin-right:5px;"" onclick=""zenPage.drillSources('CRC:",$lg(tCRCData,1),"');"" title=""Drill to articles with this CRC""></span></td>"
-			    write !,"<td><span class=""glyphicon glyphicon-pushpin"" style=""margin-right:5px;"" onclick=""zenPage.quickFilter('CRC:",$zcvt(tMaster,"O","JS"),":",$zcvt(tRelation,"O","JS"),":",$zcvt(tSlave,"O","JS"),"');"" title=""Add CRC to filter context""></span></td>"
+			    write !,"<td><span class=""glyphicon glyphicon-pushpin"" style=""margin-right:5px;"" onclick=""zenPage.quickFilter('CRC:",$zcvt(tMaster,"O","JS"),":",$zcvt(tRelation,"O","JS"),":",$zcvt(tSlave,"O","JS"),"');"" title=""Limit exploratin to articles with this CRC""></span></td>"
 			    write !,"</tr>"
 			    
 			    set cnt = cnt+1
@@ -620,7 +620,7 @@ Method DrawPaths(pSeed As %String) As %Status
 			    
 			    write !,"</td><td title=""frequency - number of occurrences"">",$lg(tCCData,5),"</td><td title=""spread - number of articles this CC occurs in"">",$lg(tCCData,6),"</td>"
 			    write !,"<td><span class=""glyphicon glyphicon-eye-open"" style=""margin-right:5px;"" onclick=""zenPage.drillSources('CC:",$lg(tCCData,1),":",$lg(tCCData,3),"');"" title=""Drill to articles containing this CC""></span></td>"
-			    write !,"<td><span class=""glyphicon glyphicon-pushpin"" style=""margin-right:5px;"" onclick=""zenPage.quickFilter('CC:",$zcvt(tMaster,"O","JS"),":",$zcvt(tSlave,"O","JS"),"');"" title=""Add CC to filter context""></span></td>"
+			    write !,"<td><span class=""glyphicon glyphicon-pushpin"" style=""margin-right:5px;"" onclick=""zenPage.quickFilter('CC:",$zcvt(tMaster,"O","JS"),":",$zcvt(tSlave,"O","JS"),"');"" title=""Limit exploration to articles with this CC""></span></td>"
 			    write !,"</tr>"
 			    
 			    set cnt = cnt+1
@@ -747,7 +747,7 @@ Method DrawSourceListModal(pSeed As %String) As %Status
 			}
 			
 			write !,"</td>"
-		    write !,"<td><span class=""glyphicon glyphicon-eye-open"" style=""margin-right:5px;"" onclick=""zenPage.openSource(",tSrcId,");""></span></td>"
+		    write !,"<td><span class=""glyphicon glyphicon-eye-open"" style=""margin-right:5px;"" onclick=""zenPage.openSource(",tSrcId,");"" title=""Open article""></span></td>"
 		    //write !,"<td><span class=""glyphicon glyphicon-play-circle"" style=""margin-right:5px;"" onclick=""location.href='_iKnow.UI.IndexingResults.zen?domain=",..domain,"&source=",tSrcId,"';""></span></td>"
 			write !,"</tr>"
 			
@@ -949,7 +949,7 @@ Method DrawButtons(pSeed As %String) As %Status
 		if ..term'="" {
 			write !,"<div class=""btn-group"" role=""group"">"
 			write !,"<button type=""button"" class=""btn btn-default"" disabled=""disabled"">Exploring '",$zcvt(..term,"O","HTML"),"'",$s(..filter="":"",1:" with filter"),"</button>"
-			write !,"<button type=""button"" class=""btn btn-default"" onclick=""zenPage.quickFilter('Entity:",$zcvt(..term,"O","JS"),"');"" title=""Add to filter context""><span class=""glyphicon glyphicon-pushpin""> </span></button>"
+			write !,"<button type=""button"" class=""btn btn-default"" onclick=""zenPage.quickFilter('Entity:",$zcvt(..term,"O","JS"),"');"" title=""Limit exploration to articles with this entity""><span class=""glyphicon glyphicon-pushpin""> </span></button>"
 			write !,"</div>"
 		}
 		
