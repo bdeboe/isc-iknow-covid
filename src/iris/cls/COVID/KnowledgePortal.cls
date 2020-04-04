@@ -1001,9 +1001,22 @@ Method DrawFilterPane(pSeed As %String) As %Status
 		// add filter form
 		write !,"<form class=""form-inline"">"
 		
+		
+		write !,"<div class=""form-group"" style=""margin-bottom: 10px;"">"
+		write !,"<label for=""selCustomFilterSetting"">Predefined set: </label>"
+		write !,"<select id=""selCustomFilterSetting"" class=""form-control input-sm"" required=""true"" >"
+		set tRS = ##class(%SQL.Statement).%ExecDirect(,"SELECT %ID, Name FROM Demo_SetAnalysis.SetDefinition WHERE DomainID = "_..domain)
+		while tRS.%Next() {
+			write !,"<option value=""",tRS.%GetData(1),""">",$zcvt(tRS.%GetData(2),"O","HTML"),"</option>"
+		}
+		write !,"</select>"
+		write !,"<button type=""button"" class=""btn btn-primary btn-sm"" style=""vertical-align: top;"" onclick=""sc = zenPage.AddFilter('Custom:set:'+$('#selCustomFilterSetting').val()); zen('modalFilter').refreshContents();"">"_("add")_"</button>"
+		write !,"</div>"
+		
 		set tFilterType = $piece(pSeed,":",1)
 		set:tFilterType="" tFilterType = "MD"
-		write !,"<label for=""selMDField"">New filter</label>"
+		write !,"<div class=""form-group"">"
+		write !,"<label for=""selMDField"">Metadata filter: </label>"
 		/*write !,"<select id=""selFilterType"" class=""form-control input-sm"" required=""true"" style=""vertical-align: top;"" onchange=""zenPage.updateFilter($('#selFilterType').val());"" >"
 		write !,"<option value=""MD""",$s(tFilterType="MD":" selected=""selected""", 1:""),">"_("metadata")_"</option>"
 		write !,"<option value=""SQL""",$s(tFilterType="SQL":" selected=""selected""", 1:""),">SQL</option>"
@@ -1113,7 +1126,9 @@ Method DrawFilterPane(pSeed As %String) As %Status
 		}
 		
 		write !,"<button type=""button"" class=""btn btn-primary btn-sm"" style=""vertical-align: top;"" onclick=""zenPage.submitFilter();"">"_("add")_"</button>"
-		write !,"</form> <!-- OK -->"
+		write !,"</div>"
+		
+		write !,"</form>"
 		
 		
 		write !,"</div>"
@@ -1203,6 +1218,8 @@ DrawFilter(tFilter, tLocation)
 			write !,"<button type=""button"" class=""btn btn-sm btn-info"" style=""margin-right: 5px; padding: 2px 10px; text-align: left;"">CRC",$s($ll(tFilter.CRCs)>1:"s",1:""),": ",$lts($lg(tFilter.CRCs,1),"~"),$s($ll(tFilter.CRCs)>1:", ...",1:""),"</button>"
 		} elseif (tFilter.%IsA("COVID.Utils.ContainsCCFilter")) {
 			write !,"<button type=""button"" class=""btn btn-sm btn-info"" style=""margin-right: 5px; padding: 2px 10px; text-align: left;"">CC",$s($ll(tFilter.CCs)>1:"s",1:""),": ",$lts($lg(tFilter.CCs,1),"~"),$s($ll(tFilter.CCs)>1:", ...",1:""),"</button>"
+		} elseif (tFilter.%IsA("Demo.SetAnalysis.SetDefinitionFilter")) {
+			write !,"<button type=""button"" class=""btn btn-sm btn-info"" style=""margin-right: 5px; padding: 2px 10px; text-align: left;"">Set: ",tFilter.SetName,"</button>"
 		} else {
 			try {
 				set tLabel = tFilter.GetLabel()
@@ -1268,7 +1285,7 @@ Method CreateCustomFilter(pFilterType As %String, pSettings As %String) As %iKno
 	if (pFilterType="set") {
 		set tSetDef = ##class(Demo.SetAnalysis.SetDefinition).%OpenId(pSettings)
 		quit:tSetDef="" ""
-		quit tSetDef.GetFilter()
+		quit tSetDef.GetSDFilter()
 	} 
 	quit ""
 }

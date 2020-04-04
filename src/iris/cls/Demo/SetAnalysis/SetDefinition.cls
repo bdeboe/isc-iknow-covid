@@ -24,6 +24,11 @@ Index EntitiesIdx On (DomainId, Entities(ELEMENTS)) [ Type = bitmap ];
 
 Index CRCsIdx On (DomainId, CRCs(ELEMENTS)) [ Type = bitmap ];
 
+Method GetSDFilter() As SetDefinitionFilter
+{
+	quit ##class(SetDefinitionFilter).%New(..DomainId,..Name)
+}
+
 /// Retrieves a <class>%iKnow.Filters.Filter</class> instance representing all the sources
 /// in this set.
 Method GetFilter() As %iKnow.Filters.Filter
