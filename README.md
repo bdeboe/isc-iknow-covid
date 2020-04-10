@@ -2,6 +2,8 @@
 
 The CORD-19 corpus (Covid-19 Open Research Dataset) consists of over 30000 research articles on COVID-19 and similar viruses and is [available to the general public](https://pages.semanticscholar.org/coronavirus-research) for research and experimentation. At InterSystems, we are looking into ways to leverage our NLP technology (for which a standalone version is [available as open source](https://github.com/intersystems/iknow)) to make this dataset easer to browse and help people draw insights from it more quickly. 
 
+A hosted version of this knowledge browser is available at **[https://covid19nlp.intersystems.com/](https://covid19nlp.intersystems.com/csp/user/menu.csp)**.
+
 This repository contains everything you need to get started, automating the process of downloading and processing the dataset and setting up a few demo environments to explore this vast research corpus. We very much value your suggestions on making these interfaces easier to navigate and any particular insights you gleaned through them. Please use the [issues](https://github.com/bdeboe/isc-iknow-covid/issues) section for all these and other kinds of feedback you'd like to share.
 
 The `/docs` folder includes a [PDF explaining how to use the main Domain Explorer interface](https://github.com/bdeboe/isc-iknow-covid/blob/master/docs/COVID-19_Explorer_Documentation.pdf).
