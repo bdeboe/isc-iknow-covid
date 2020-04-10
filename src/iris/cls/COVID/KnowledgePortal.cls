@@ -968,7 +968,7 @@ Method DrawButtons(pSeed As %String) As %Status
 		}
 		//write !,"<button type=""button"" class=""btn btn-default"" title="""_("Select domain and other settings")_""" onclick=""$('#modalSettings').modal('show');""><span class=""glyphicon glyphicon-cog""></span></button>"
 		write !,"<button type=""button"" class=""btn btn-default"" title=""Clear exploration and filter context"" onclick=""zenPage.resetFilter();zenPage.explore('');""><span class=""glyphicon glyphicon-remove""></span></button>"
-		write !,"<button type=""button"" class=""btn btn-default"" title="""_("More about this interface")_""" onclick=""window.open('https://community.intersystems.com/post/iknow-demo-apps-part-1-knowledge-portal');""><span class=""glyphicon glyphicon-info-sign""></span></button>"
+		write !,"<button type=""button"" class=""btn btn-default"" title="""_("More about this interface")_""" onclick=""window.open('https://github.com/bdeboe/isc-iknow-covid/raw/master/docs/COVID-19_Explorer_Documentation.pdf');""><span class=""glyphicon glyphicon-info-sign""></span></button>"
 		write !,"</span>"
 		write !,"</div>"
 		
