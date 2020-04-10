@@ -4,6 +4,8 @@ The CORD-19 corpus (Covid-19 Open Research Dataset) consists of over 30000 resea
 
 This repository contains everything you need to get started, automating the process of downloading and processing the dataset and setting up a few demo environments to explore this vast research corpus. We very much value your suggestions on making these interfaces easier to navigate and any particular insights you gleaned through them. Please use the [issues](https://github.com/bdeboe/isc-iknow-covid/issues) section for all these and other kinds of feedback you'd like to share.
 
+The `/docs` folder includes a [PDF explaining how to use the main Domain Explorer interface](https://github.com/bdeboe/isc-iknow-covid/blob/master/docs/COVID-19_Explorer_Documentation.pdf).
+
 ## Setting up on an existing IRIS instance
 
 1. Import the contents of this repository into your namespace of choice (feel free to take a blank one) and compile, e.g. using:

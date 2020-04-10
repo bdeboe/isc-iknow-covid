@@ -3,6 +3,7 @@
 <html>
 <head>
 	<title>COVID-19 iKnow Content Navigator</title>
+	<script language="Cache" runat="server"> write "<base href=""/csp/",$namespace,"/"" />" </script>
     <link rel="stylesheet" type="text/css" href="nglib/bootstrap/css/bootstrap.min.css" />
     <script type="text/javascript" src="nglib/jquery-2.0.3.min.js"></script>
     <script type="text/javascript" src="nglib/bootstrap/js/bootstrap.min.js"></script>
