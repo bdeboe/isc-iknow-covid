@@ -8,7 +8,7 @@ Class COVID.Domains.Abstracts Extends %iKnow.DomainDefinition
 XData Domain [ XMLNamespace = "http://www.intersystems.com/iknow" ]
 {
 <domain name="COVID-19 Abstracts">
-<configuration name="Abstracts-ALI" detectLanguage="true" languages="en,fr,es,de,nl,pt" />
+<configuration name="Abstracts-ALI" detectLanguage="true" languages="en,fr,es,de,pt" />
 <metadata>
 <field name="PaperID"/>
 <field name="Source" storage="1" />

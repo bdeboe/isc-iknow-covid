@@ -8,7 +8,7 @@ Class COVID.Domains.BodyText Extends %iKnow.DomainDefinition
 XData Domain [ XMLNamespace = "http://www.intersystems.com/iknow" ]
 {
 <domain name="COVID-19 Body Text">
-<configuration name="BodyText-ALI" detectLanguage="true" languages="en,fr,es,de,nl,pt" />
+<configuration name="BodyText-ALI" detectLanguage="true" languages="en,fr,es,de,pt" />
 <metadata>
 <field name="PaperID"/>
 <field name="Source" storage="1" />
