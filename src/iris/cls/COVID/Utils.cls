@@ -7,10 +7,10 @@ ClassMethod CleanUp() As %Status
 	while tRS.%Next() {
 		do $classmethod(tRS.Name,"%KillExtent")
 	}
-	quit $$$OK
+	quit ##class(Research.FullDocument).%KillExtent()
 }
 
-ClassMethod Download(pFiles As %String = "biorxiv_medrxiv,comm_use_subset,noncomm_use_subset,custom_license", pUpdate = "2020-03-27", pTempDir As %String = "") As %Status
+ClassMethod Download(pFiles As %String = "biorxiv_medrxiv,comm_use_subset,noncomm_use_subset,custom_license", pUpdate = "2020-04-10", pTempDir As %String = "") As %Status
 {
 	set tSC = $$$OK
 	try {

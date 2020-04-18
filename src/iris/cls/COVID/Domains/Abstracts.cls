@@ -8,6 +8,7 @@ Class COVID.Domains.Abstracts Extends %iKnow.DomainDefinition
 XData Domain [ XMLNamespace = "http://www.intersystems.com/iknow" ]
 {
 <domain name="COVID-19 Abstracts">
+<configuration name="Abstracts-ALI" detectLanguage="true" languages="en,fr,es,de,nl,pt" />
 <metadata>
 <field name="PaperID"/>
 <field name="Source" storage="1" />
@@ -17,7 +18,8 @@ XData Domain [ XMLNamespace = "http://www.intersystems.com/iknow" ]
 <query sql="SELECT %ID as ID, * FROM Research.FullDocument" 
  idField="ID" groupField="Source" dataFields="Abstract"
  metadataFields="PaperID,Source,Title"
- metadataColumns="PaperID,Source,Title" >
+ metadataColumns="PaperID,Source,Title"
+ configuration="Abstracts-ALI" >
  </query>
 </data>
 </domain>
