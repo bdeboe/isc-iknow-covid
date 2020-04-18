@@ -49,6 +49,7 @@ ClassMethod Download(pFiles As %String = "biorxiv_medrxiv,comm_use_subset,noncom
 			
 			w !,"Unzipping..."
 			do ##class(%File).CreateDirectoryChain(pTempDir_tFilename)
+			do ##class(%File).CreateDirectoryChain(pTempDir_tFilename_tSeparator_"pdf_json")
 			do ##class(Utils.FileBinaryTar).ExtractFile(tFilePtr.Filename, 1, pTempDir)
 			w " done"
 			
@@ -99,13 +100,18 @@ ClassMethod LoadDir(pDir As %String = "C:\Users\bdeboe\Desktop\covid\pmc_custom_
 		set tRS = ##class(%ResultSet).%New()
 		set tRS.ClassName = "%File"
 		set tRS.QueryName = "FileSet"
-		do tRS.%Execute(pDir, "*.json")
+		do tRS.%Execute(pDir, "*.json",, 1)
 		// ignore errors. they would simply mean the directory isn't there
 		
 		set tFile = ##class(%Stream.FileCharacter).%New()
 		
 		set (n,errors) = 0
-		while tRS.%Next() {
+		while tRS.%Next() { 
+			if tRS.%Get("Type")="D" {
+				set tSubdirs($i(tSubdirs))=tRS.%Get("Name")
+				continue
+			}
+			
 			set tRecord = ##class(Research.Document).%New()
 			do tFile.LinkToFile(tRS.Name)
 			
@@ -168,6 +174,12 @@ ClassMethod LoadDir(pDir As %String = "C:\Users\bdeboe\Desktop\covid\pmc_custom_
 		}
 		quit:$$$ISERR(tSC)
 		write !,"Loaded ",n," documents",!
+		
+		// recurse into subdirs (after 2020-04-10)
+		for i = 1:1:$g(tSubdirs) {
+			set tSC = ..LoadDir(tSubdirs(i)_tSep,pStore,pMaxErrors,pSkipExistingPaperID)
+			quit:$$$ISERR(tSC)
+		}
 		
 	} catch (ex) {
 		set tSC = ex.AsStatus()
