@@ -115,6 +115,10 @@ ClassMethod LoadDir(pDir As %String = "C:\Users\bdeboe\Desktop\covid\pmc_custom_
 			set tRecord = ##class(Research.Document).%New()
 			do tFile.LinkToFile(tRS.Name)
 			
+			set tPaperID = $e($piece(tFile.Filename,tSep,*),1,*-5)				
+			continue:pSkipExistingPaperID&&##class(Research.FullDocument).idxPaperExists(tPaperID)
+
+			
 			set tSC = tRecord.%JSONImport(tFile)
 			if $$$ISERR(tSC) {
 				write !,"Error reading JSON for paper ",tPaperID,", skipping"
@@ -123,8 +127,6 @@ ClassMethod LoadDir(pDir As %String = "C:\Users\bdeboe\Desktop\covid\pmc_custom_
 				continue
 			}
 			
-			set tPaperID = $e($piece(tFile.Filename,tSep,*),1,*-5)
-			
 			if (pStore = "raw") {
 				
 				set tRecord.Filename = $piece(tFile.Filename,tSep,*)
@@ -132,8 +134,6 @@ ClassMethod LoadDir(pDir As %String = "C:\Users\bdeboe\Desktop\covid\pmc_custom_
 				set tSC = tRecord.%Save()
 				
 			} else {
-				
-				continue:pSkipExistingPaperID&&##class(Research.FullDocument).idxPaperExists(tPaperID)
 				
 				set tFullDoc = ##class(Research.FullDocument).%New()
 				set tFullDoc.Source = $piece(pDir,tSep,*-1)
