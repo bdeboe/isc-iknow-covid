@@ -54,7 +54,7 @@ ClassMethod Download(pFiles As %String = "biorxiv_medrxiv,comm_use_subset,noncom
 			w " done"
 			
 			w !,"Loading into Research.FullDocument table.."
-			set tSC = ..LoadDir(pTempDir_tFilename,,,1)
+			set tSC = ..LoadDir(pTempDir_tFilename, tFilename,,,1)
 			quit:$$$ISERR(tSC)
 			
 			w !,"Cleaning up temporary files"
@@ -78,7 +78,7 @@ ClassMethod LoadAll(pBaseDir As %String = "C:\Users\bdeboe\Desktop\covid\", pSki
 		do ..CleanUp()
 		
 		for tDir = "pmc_custom_license", "comm_use_subset", "noncomm_use_subset", "biorxiv_medrxiv" {
-			set tSC = ..LoadDir(pBaseDir_tDir_tSep)
+			set tSC = ..LoadDir(pBaseDir_tDir_tSep, tDir)
 			quit:$$$ISERR(tSC)
 		}
 		
@@ -88,7 +88,7 @@ ClassMethod LoadAll(pBaseDir As %String = "C:\Users\bdeboe\Desktop\covid\", pSki
 	quit tSC
 }
 
-ClassMethod LoadDir(pDir As %String = "C:\Users\bdeboe\Desktop\covid\pmc_custom_license\", pStore As %String(VALUELIST=",raw,full") = "full", pMaxErrors As %Integer = 100, pSkipExistingPaperID As %Boolean = 1) As %Status
+ClassMethod LoadDir(pDir As %String = "", pSource As %String = "noncomm_use_subset", pMaxErrors As %Integer = 100, pSkipExistingPaperID As %Boolean = 1, pStore As %String(VALUELIST=",raw,full") = "full") As %Status
 {
 	set tSC = $$$OK
 	try {
@@ -130,13 +130,13 @@ ClassMethod LoadDir(pDir As %String = "C:\Users\bdeboe\Desktop\covid\pmc_custom_
 			if (pStore = "raw") {
 				
 				set tRecord.Filename = $piece(tFile.Filename,tSep,*)
-				set tRecord.Source = $piece(pDir,tSep,*-1)
+				set tRecord.Source = pSource
 				set tSC = tRecord.%Save()
 				
 			} else {
 				
 				set tFullDoc = ##class(Research.FullDocument).%New()
-				set tFullDoc.Source = $piece(pDir,tSep,*-1)
+				set tFullDoc.Source = pSource
 				set tFullDoc.Filename = tFile.Filename
 				set tFullDoc.PaperID = tPaperID
 				set tFullDoc.Title = tRecord.metadata.title
@@ -177,7 +177,7 @@ ClassMethod LoadDir(pDir As %String = "C:\Users\bdeboe\Desktop\covid\pmc_custom_
 		
 		// recurse into subdirs (after 2020-04-10)
 		for i = 1:1:$g(tSubdirs) {
-			set tSC = ..LoadDir(tSubdirs(i)_tSep,pStore,pMaxErrors,pSkipExistingPaperID)
+			set tSC = ..LoadDir(tSubdirs(i)_tSep,pSource,pMaxErrors,pSkipExistingPaperID,pStore)
 			quit:$$$ISERR(tSC)
 		}
 		
