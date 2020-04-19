@@ -105,7 +105,7 @@ ClassMethod LoadDir(pDir As %String = "", pSource As %String = "noncomm_use_subs
 		
 		set tFile = ##class(%Stream.FileCharacter).%New()
 		
-		set (n,errors) = 0
+		set (n,errors,dup) = 0
 		while tRS.%Next() { 
 			if tRS.%Get("Type")="D" {
 				set tSubdirs($i(tSubdirs))=tRS.%Get("Name")
@@ -118,11 +118,10 @@ ClassMethod LoadDir(pDir As %String = "", pSource As %String = "noncomm_use_subs
 			set tPaperID = $e($piece(tFile.Filename,tSep,*),1,*-5)				
 			continue:pSkipExistingPaperID&&##class(Research.FullDocument).idxPaperExists(tPaperID)
 
-			
 			set tSC = tRecord.%JSONImport(tFile)
 			if $$$ISERR(tSC) {
 				write !,"Error reading JSON for paper ",tPaperID,", skipping"
-				set errors = errors+1
+				set errors = errors+1, tSC=$$$OK
 				quit:errors>=pMaxErrors
 				continue
 			}
@@ -141,39 +140,50 @@ ClassMethod LoadDir(pDir As %String = "", pSource As %String = "noncomm_use_subs
 				set tFullDoc.PaperID = tPaperID
 				set tFullDoc.Title = tRecord.metadata.title
 				
-				set tText = ""
-				
-				// some papers are badly encoded: truncate title to 25 words
-				if $l(tFullDoc.Title)>250 {
-					set tText = tFullDoc.Title
-					set tFullDoc.Title = $piece(tFullDoc.Title," ",1,25)
-					write !,"Bad title for paper ",tPaperID," - prepending to Abstract and truncating"
+				try {
+					set tText = ""
+					
+					// some papers are badly encoded: truncate title to 25 words
+					if $l(tFullDoc.Title)>250 {
+						set tText = tFullDoc.Title
+						set tFullDoc.Title = $piece(tFullDoc.Title," ",1,25)
+						write !,"Bad title for paper ",tPaperID," - prepending to Abstract and truncating"
+					}
+					
+					for i = 1:1:tRecord.abstract.Count() {
+						set tText = tText _ $c(13,10,13,10) _ tRecord.abstract.GetAt(i).text
+					}
+					do tFullDoc.Abstract.Write($zstrip(tText,"<>C"))
+					
+					set tText=""
+					for i = 1:1:tRecord.bodytext.Count() {
+						set tText = tText _ $c(13,10,13,10) _ tRecord.bodytext.GetAt(i).text
+					}
+					do tFullDoc.BodyText.Write($zstrip(tText,"<>C"))
+					
+					// de-duplicate
+					set tFullDoc.BodyHash = $zcrc($zstrip($e(tText,1,32000),"<>WC"),7)
+					if ##class(Research.FullDocument).idxHashExists(tFullDoc.BodyHash) {
+						set dup=dup+1
+						continue
+					}
+					
+					set tSC = tFullDoc.%Save()
+				} catch (ex) {
+					set tSC = ex.AsStatus()
 				}
-				
-				for i = 1:1:tRecord.abstract.Count() {
-					set tText = tText _ $c(13,10,13,10) _ tRecord.abstract.GetAt(i).text
-				}
-				do tFullDoc.Abstract.Write($zstrip(tText,"<>C"))
-				
-				set tText=""
-				for i = 1:1:tRecord.bodytext.Count() {
-					set tText = tText _ $c(13,10,13,10) _ tRecord.bodytext.GetAt(i).text
-				}
-				do tFullDoc.BodyText.Write($zstrip(tText,"<>C"))
-				
-				set tSC = tFullDoc.%Save()
 			}
 			
 			if $$$ISERR(tSC) {
 				write !,"Error writing paper ",tPaperID, /*" (",$system.Status.GetErrorText(tSC),")",*/ ", skipping"
-				set errors = errors+1
+				set errors = errors+1, tSC=$$$OK
 				quit:errors>=pMaxErrors
 			} else {
 				set n = n+1
 			}
 		}
 		quit:$$$ISERR(tSC)
-		write !,"Loaded ",n," documents",!
+		write !,"Loaded ",n," documents (skipping ",dup," duplicates)",!
 		
 		// recurse into subdirs (after 2020-04-10)
 		for i = 1:1:$g(tSubdirs) {

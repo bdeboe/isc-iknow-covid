@@ -17,6 +17,10 @@ Property BodyText As %Stream.GblChrCompress;
 
 Property CreatedAt As %TimeStamp [ InitialExpression = {$ZDATETIME($ZTIMESTAMP,3,1,3)}, Required ];
 
+Property BodyHash As %Integer;
+
+Index idxHash On BodyHash;
+
 Index idxSource On Source [ Type = bitmap ];
 
 Index idxPaper On PaperID;
@@ -52,6 +56,9 @@ Storage Default
 <Value name="8">
 <Value>CreatedAt</Value>
 </Value>
+<Value name="9">
+<Value>BodyHash</Value>
+</Value>
 </Data>
 <DataLocation>^DCG2.YPjm.1</DataLocation>
 <DefaultData>FullDocumentDefaultData</DefaultData>
@@ -68,6 +75,9 @@ Storage Default
 </Index>
 <Index name="idxBody">
 <Location>^DCG2.YPjm.4</Location>
+</Index>
+<Index name="idxHash">
+<Location>^DCG2.YPjm.7</Location>
 </Index>
 <Index name="idxPaper">
 <Location>^DCG2.YPjm.5</Location>
